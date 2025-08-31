@@ -69,7 +69,7 @@ function GetProduct(id: number): Promise<Product> {
   });
 }
 
-export function GetProducts(): Promise<string> {
+export function GetProducts(): Promise<Product[]> {
     return new Promise((resolve, reject) => {
         db.all("SELECT * FROM products", (error, rows) => {
             if (error) {
@@ -89,7 +89,7 @@ export function GetProducts(): Promise<string> {
                 image: row.image ?? null,
             }));
 
-            resolve("products fetched successfully");
+            resolve(products);
         });
     });
 }
