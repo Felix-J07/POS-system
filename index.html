@@ -1,0 +1,19 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>POS System</title>
+    <link rel="stylesheet" href="./src/ui/style.css">
+    <link rel="stylesheet" href="./src/ui/navbar.css">
+    <link rel="stylesheet" href="./src/ui/clock.css">
+  </head>
+  <body>
+    <!--Clock-->
+    <div id="MyClockDisplay" class="clock" onload="showTime()"></div>
+    <!--Navbar-->
+    <div id="root"></div>
+    <script type="module" src="/src/ui/main.tsx"></script>
+    <script src="./src/ui/static/clock.js"></script>
+  </body>
+</html>

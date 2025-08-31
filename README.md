@@ -1,2 +1,3 @@
-# POS-system
-This is a Point Of Sale system made for Rybners HTX lan committee
+# POS System
+
+This is a Point-Of-Sale (POS) System made for Rybners HTX Lan committee.

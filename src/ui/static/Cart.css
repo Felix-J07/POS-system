@@ -1,0 +1,199 @@
+.cart {
+    width: 45%;
+    min-width: 350px;
+    max-width: 500px;
+    margin: 0 0 0 0; /* push to the right */
+    border-radius: 20px;
+    background: white;
+    box-shadow: rgba(0, 0, 0, 0.15) 1.95px 1.95px 2.6px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 24px;
+    box-sizing: border-box;
+    position: relative;
+    overflow-y: auto;
+    z-index: 0;
+}
+
+.cart h3 {
+    margin: 0 0 16px 0;
+    font-size: 24px;
+    font-weight: bold;
+}
+
+#barcodeCartInput {
+    all: unset;
+    color: black;
+    font-size: 16px;
+    width: 90%;
+    padding: 8px;
+    margin-bottom: 16px;
+    border: 1px solid #cccccc;
+    border-radius: 8px;
+    background-color: #ebeaeaa2;
+    /*background-color: #bd232321; (red)*/
+    /*background-color: #1ddb462f; (green)*/
+    box-sizing: border-box;
+    text-align: center;
+}
+
+.cart-products {
+    width: 90%;
+    min-height: 100px;
+    overflow-y: auto; /* Allows scrolling if content overflows */
+}
+
+.cart-product {
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+    gap: 12px;
+    /*border: 1px solid #ccc;*/
+    /*border-bottom: 1px solid #ccc;*/
+    border-top: 1px solid #ccc;
+    /*border-radius: 10px;*/
+    padding: 10px;
+    margin-bottom: 0px;
+    background: #fdfdfd;
+}
+
+.cart-product-image {
+    width: 64px;
+    height: 80px;
+    object-fit: cover;
+    border-radius: 8px;
+    background: #eee;
+    flex-shrink: 0;
+}
+
+.cart-product-info {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    min-width: 0;
+}
+
+.cart-product-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.cart-product-row-top {
+    margin-bottom: 6px;
+}
+
+.cart-product-name {
+    font-weight: bold;
+    font-size: 16px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+}
+
+.cart-product-brand {
+    color: #888;
+    font-size: 14px;
+    margin-right: 4px;
+}
+
+.cart-product-title {
+    display: block;         /* Makes it behave like a div, so it fills the width */
+    text-align: left;       /* Ensures left alignment */
+    width: 100%;            /* Fill parent width */
+    margin: 0;              /* Remove any default margin */
+    padding: 0;             /* Remove any default padding */
+    word-break: break-word; /* Wrap long words if needed */
+}
+
+.remove-button {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 4px;
+}
+
+.cart-product-row-bottom {
+    margin-top: 4px;
+}
+
+.cart-product-qty {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.qty-btn {
+    all: unset;
+    width: 28px;
+    height: 28px;
+    border: 1px solid #ccc;
+    background: #f0f0f0;
+    border-radius: 4px;
+    font-size: 18px;
+    cursor: pointer;
+}
+
+.qty-input {
+    all: unset;
+    width: 40px;
+    text-align: center;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    padding: 2px;
+    background: #fff;
+}
+
+/* Chrome, Safari, Edge, Opera */
+.qty-input::-webkit-outer-spin-button,
+.qty-input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+/* Firefox */
+.qty-input[type="number"] {
+    -moz-appearance: textfield;
+}
+
+.cart-product-price {
+    font-weight: bold;
+    font-size: 15px;
+    color: #333;
+    margin: 3px;
+}
+
+.cart-checkout {
+    width: 90%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: auto; /* Pushes checkout to the bottom */
+    border-top: 1px solid #ccc;
+    background: #fff;
+    padding: 10px 0px 10px 0px;
+    /* Remove position: sticky and bottom: 0; */
+    z-index: 1;
+}
+
+.cart-checkout p {
+    margin-bottom: 12px;
+}
+
+.cart-checkout-buttons {
+    display: flex;
+    gap: 12px;
+    width: 100%;
+    justify-content: center;
+}
+
+.cart-checkout button {
+    flex: 1 1 0;
+    margin: 0;
+    min-width: 0;
+    max-width: 140px;
+}

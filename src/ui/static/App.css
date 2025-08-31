@@ -1,0 +1,27 @@
+#root {
+  margin: 0 auto;
+  padding: 2rem;
+  text-align: center;
+}
+
+.main-container {
+    display: flex;
+    width: calc(100% - 80px);
+    height: calc(100vh - 64px); /* 64px = 24px top + 24px bottom padding + 16px mystery*/
+    box-sizing: border-box;
+    gap: 24px;
+    padding: 1px;
+    min-width: calc(600px + 80px + 24px + 30px); /* Ensures minimum width for content and sidebar */
+    overflow: hidden; /* Prevents the main-container from overflowing */
+    margin-left: 80px; /* Pushes content to the right */
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  a:nth-of-type(2) .logo {
+    animation: logo-spin infinite 20s linear;
+  }
+}
+
+.card {
+  padding: 2em;
+}
