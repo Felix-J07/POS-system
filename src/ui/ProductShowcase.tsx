@@ -12,7 +12,6 @@ function ProductShowcase({ products, cart, setCart, setProducts }: ProductShowca
     const updateProducts = () => {
         // @ts-ignore
         window.electron.get_products().then((products: Product[]) => {
-            console.log("ProductShowcase.tsx:", products);
             if (products === undefined) {
                 console.error("Products is undefined in ProductShowcase.tsx");
                 return;

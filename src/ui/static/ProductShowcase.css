@@ -1,4 +1,5 @@
 .product-showcase {
+    user-select: none;
     flex: 1 1 auto;
     border-radius: 16px;
     display: flex;

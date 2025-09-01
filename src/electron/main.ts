@@ -1,6 +1,6 @@
 import { app, BrowserWindow, ipcMain } from "electron"
 import * as path from "path";
-import { GetProducts } from "./comunication.js";
+import { GetProducts } from "./database.js";
 import { isDev } from "./util.js";
 import log from "electron-log";
 
@@ -23,6 +23,7 @@ app.on('ready', () => {
     });
     if (isDev()) {
         mainWindow.loadURL("http://localhost:5123");
+        mainWindow.webContents.openDevTools();
     } else {
         mainWindow.loadFile(path.join(app.getAppPath(), "dist-react", "index.html"));
         mainWindow.setMenuBarVisibility(false);
@@ -32,9 +33,7 @@ app.on('ready', () => {
     }
 
     ipcMain.handle("get-products", async (event, argz) => {
-        const GetProducts = () => {};
         const products = await GetProducts();
-        log.info("Products: " + products);
         return products;
     });
 });

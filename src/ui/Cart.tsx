@@ -116,12 +116,13 @@ export function AddToCart(newProduct: Product, cart: CartType, setCart: React.Di
   const index = cart.cartProducts.findIndex(cartproduct => cartproduct.product.id === newProduct.id);
   let updatedTotalPrice = cart.totalPrice;
   if (index === -1) {
-    if (amount === undefined) {
-      amount = 1;
-    } else if (amount > 0){
+    if (amount !== undefined && amount > 0) {
       updatedTotalPrice += GetPrice(newProduct) * amount;
-      setCart({ cartProducts: [{product: newProduct, amount: amount}, ...cart.cartProducts ], totalPrice: updatedTotalPrice})
+    } else {
+      amount = 1;
+      updatedTotalPrice += GetPrice(newProduct);
     }
+    setCart({ cartProducts: [{product: newProduct, amount: amount}, ...cart.cartProducts ], totalPrice: updatedTotalPrice})
   } else {
     newProduct = cart.cartProducts[index].product;
     let updatedAmount = cart.cartProducts[index].amount;
