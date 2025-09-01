@@ -3,7 +3,6 @@ import { useState, useEffect } from 'react'
 import Navbar from './Navbar'
 import Cart from './Cart'
 import ProductShowcase from './ProductShowcase'
-import type { Product, Cart as CartType } from "../types"
 
 function App() {
   const [checkout_bool, setCheckout_bool] = useState(false); // Boolean to toggle between checkout and product showcase

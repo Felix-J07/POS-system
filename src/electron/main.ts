@@ -1,6 +1,6 @@
 import { app, BrowserWindow, ipcMain } from "electron"
 import * as path from "path";
-//import { GetProducts } from "../database/comunication.js";
+import { GetProducts } from "./comunication.js";
 import { isDev } from "./util.js";
 import log from "electron-log";
 
@@ -14,13 +14,12 @@ app.on('ready', () => {
     let mainWindow = new BrowserWindow({
         // preload script
         webPreferences: {
-            preload: path.join(app.getAppPath(), "src", "preload.js"),
-            // preload: path.join(app.getAppPath(), "dist-electron", "preload.js"),
+            preload: path.join(app.getAppPath(), isDev() ? "." : "..", "dist-electron", "preload.cjs"),
             contextIsolation: true,
             nodeIntegration: false
         },
         width: 1200,
-        height: 800
+        height: 600
     });
     if (isDev()) {
         mainWindow.loadURL("http://localhost:5123");
@@ -33,11 +32,9 @@ app.on('ready', () => {
     }
 
     ipcMain.handle("get-products", async (event, argz) => {
-        log.info("ipcMain");
         const GetProducts = () => {};
         const products = await GetProducts();
-        log.info(products);
-        log.info("main.ts");
+        log.info("Products: " + products);
         return products;
     });
 });

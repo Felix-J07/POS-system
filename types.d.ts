@@ -1,4 +1,4 @@
-export type Product = {
+type Product = {
     id: number,
     barcode: string,
     brand: string,
@@ -9,7 +9,7 @@ export type Product = {
     image?: string, // Optional field for product images
 }
 
-export type Cart = {
+type CartType = {
     cartProducts: {
         product: Product, // Product details
         amount: number, // Amount of this product in the cart
@@ -17,7 +17,7 @@ export type Cart = {
     totalPrice: number, // Total price of the cart
 }
 
-export type Sale = {
+type Sale = {
     id: number,
     datetime: string, // ISO date string
     total_sale_price: number,
@@ -28,7 +28,7 @@ export type Sale = {
     }[] // Array of products sold in this sale
 }
 
-export type SaleStatistics = {
+type SaleStatistics = {
     id: number,
     datetime: string, // ISO date string
     total_sale_price: number,
@@ -39,13 +39,13 @@ export type SaleStatistics = {
     } // Array of products sold in this sale
 }
 
-export type HappyHour = {
+type HappyHour = {
     products: Product[],
     startTime: Date,
     endTime: Date
 }
 
-export type HappyHourProduct = {
+type HappyHourProduct = {
     product: Product,
     timestamps: {
         startTime: Date,
@@ -53,7 +53,13 @@ export type HappyHourProduct = {
     }[]
 }
 
-export type Note = {
+type Note = {
     product: Product,
     note: string
+}
+
+interface Window {
+    electron: {
+        get_products: () => Promise<Product[]>;
+    }
 }

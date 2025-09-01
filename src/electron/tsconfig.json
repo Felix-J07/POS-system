@@ -10,5 +10,7 @@
         "outDir": "../../dist-electron",
         // Ignore errors from dependencies
         "skipLibCheck": true,
+        // Add global types
+        "types": ["../../types"]
     }
 }

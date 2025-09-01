@@ -1,5 +1,4 @@
 import './static/Cart.css'
-import type { Product, Cart as CartType, HappyHourProduct } from '../types'
 import type React from 'react'
 import { Trash } from 'lucide-react';
 

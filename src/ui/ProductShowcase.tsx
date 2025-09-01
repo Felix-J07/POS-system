@@ -1,4 +1,3 @@
-import type { Product, Cart as CartType } from '../types';
 import { AddToCart } from './Cart';
 import './static/ProductShowcase.css';
 
@@ -11,7 +10,8 @@ type ProductShowcaseProps = {
 
 function ProductShowcase({ products, cart, setCart, setProducts }: ProductShowcaseProps) {
     const updateProducts = () => {
-        (window as any).electron.get_products().then((products: Product[]) => {
+        // @ts-ignore
+        window.electron.get_products().then((products: Product[]) => {
             console.log("ProductShowcase.tsx:", products);
             if (products === undefined) {
                 console.error("Products is undefined in ProductShowcase.tsx");
