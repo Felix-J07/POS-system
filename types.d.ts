@@ -6,6 +6,10 @@ type Product = {
     price: number,
     stock: number,
     happy_hour_price: number,
+    happy_hour_timestamps: {
+        startTime: Date,
+        endTime: Date
+    }[]
     image?: string, // Optional field for product images
 }
 
@@ -18,7 +22,6 @@ type CartType = {
 }
 
 type Sale = {
-    id: number,
     datetime: string, // ISO date string
     total_sale_price: number,
     soldProducts: {
@@ -45,14 +48,6 @@ type HappyHour = {
     endTime: Date
 }
 
-type HappyHourProduct = {
-    product: Product,
-    timestamps: {
-        startTime: Date,
-        endTime: Date
-    }[]
-}
-
 type Note = {
     product: Product,
     note: string
@@ -61,5 +56,6 @@ type Note = {
 interface Window {
     electron: {
         get_products: () => Promise<Product[]>;
+        //
     }
 }

@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom';
 import './static/Navbar.css';
 import { House, PackageOpen, ChartLine, Settings } from 'lucide-react';
 
@@ -7,34 +8,34 @@ function Navbar() {
             <ul className="navbar__menu">
                 <li id="home" className="navbar__item">
                     <div className="navbar__link">
-                        <a href="" target="_blank">
+                        <Link to="">
                             <House color="black" />
                             <span>Bestillingsside</span>
-                        </a>
+                        </Link>
                     </div>
                 </li>
                 <li id="storage" className="navbar__item">
                     <div className="navbar__link">
-                        <a href="/storage" target="_blank">
+                        <Link to="/storage">
                             <PackageOpen color="black" />
                             <span>Lager</span>
-                        </a>
+                        </Link>
                     </div>
                 </li>
                 <li className="navbar__item">
                     <div id="statistics" className="navbar__link">
-                        <a href="/statistics" target="_blank">
+                        <Link to="/statistics">
                             <ChartLine color="black" />
                             <span>Statistik</span>
-                        </a>
+                        </Link>
                     </div>        
                 </li>
                 <li className="navbar__item">
                     <div id="settings" className="navbar__link">
-                        <a href="/settings" target="_blank">
+                        <Link to="/settings">
                             <Settings color="black" />
                             <span>Indstillinger</span>
-                        </a>
+                        </Link>
                     </div>        
                 </li>
             </ul>

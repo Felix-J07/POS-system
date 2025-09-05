@@ -1,15 +1,17 @@
 import './static/Cart.css'
 import type React from 'react'
 import { Trash } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { GetProducts } from './database';
 
 type CartProps = {
-  setCheckout_bool: React.Dispatch<React.SetStateAction<boolean>>;
   products: Product[];
   cart: CartType;
   setCart: React.Dispatch<React.SetStateAction<CartType>>;
+  setSale: React.Dispatch<React.SetStateAction<Sale | null>>;
 };
 
-function Cart({ setCheckout_bool, products, cart, setCart }: CartProps) {
+function Cart({ products, cart, setCart, setSale }: CartProps) {
   
   const { cartProducts, totalPrice } = cart;
 
@@ -48,8 +50,8 @@ function Cart({ setCheckout_bool, products, cart, setCart }: CartProps) {
         <div className="cart-checkout">
           <p>Total Price: {totalPrice.toFixed(2)}</p>
           <div className="cart-checkout-buttons">
-            <button type="button" id="clearCart" onClick={() => setCart({ cartProducts: [], totalPrice: 0 })}>Clear Cart</button>
-            <button type="button" id="checkout" onClick={() => setCheckout_bool(true)}>Checkout</button>
+            <button type="button" id="clearCart" onClick={() => setCart({ cartProducts: [], totalPrice: 0 })}>Ryd kurven</button>
+            <button type="button" id="checkout" onClick={() => setSale(SaleConvert(cart))}><Link to="/checkout" style={{ color: 'white' }}>Gå til betaling</Link></button>
           </div>
         </div>
       </div>
@@ -105,6 +107,20 @@ function productDiv(product: Product, amount: number, cart: CartType, setCart: R
   );
 }
 
+function SaleConvert(cart: CartType) {
+  if (cart.cartProducts.length < 1) return null;
+  let sale: Sale = {
+    datetime: new Date().toISOString(),
+    total_sale_price: parseFloat(cart.cartProducts.reduce((sum, item) => sum + GetPrice(item.product) * item.amount, 0).toFixed(2)),
+    soldProducts: cart.cartProducts.map(({ product, amount }) => ({
+      product: product,
+      quantity: amount,
+      price: parseFloat(GetPrice(product).toFixed(2)) // Get the price at the time of sale
+    }))
+  }
+  return sale;
+}
+
 function RemoveFromCart(productId: number, cart: CartType, setCart: React.Dispatch<React.SetStateAction<CartType>>) {
   const { cartProducts } = cart; // Fetch current products in cart
   const updatedProducts = cartProducts.filter(item => item.product.id !== productId);
@@ -148,22 +164,10 @@ export function AddToCart(newProduct: Product, cart: CartType, setCart: React.Di
 }
 
 function GetPrice(product: Product): number {
-  const happy_hour: HappyHourProduct = GetHappyHour(product)
-
-  if (happy_hour.timestamps.length !== 0) {
-    const happy_hour_now: boolean = happy_hour.timestamps.some(({ startTime, endTime }) => Date.now() >= startTime.getTime() && Date.now() <= endTime.getTime());
-    if (happy_hour_now) {
-      return product.happy_hour_price;
-    }
-    return product.price;
-  } else {
-    return product.price;
+  if (product.happy_hour_timestamps.some((timestamp) => timestamp.endTime.getTime() >= Date.now() && timestamp.startTime.getTime() <= Date.now())) {
+    return product.happy_hour_price;
   }
-}
-
-function GetHappyHour(product: Product): HappyHourProduct {
-  // Get happy hour from sql database
-  return { product: product, timestamps: [] };
+  return product.price;
 }
 
 export default Cart;

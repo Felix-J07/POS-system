@@ -27,7 +27,7 @@ CREATE TABLE IF NOT EXISTS settings (
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE TABLE IF NOT EXISTS happy_hour (
+CREATE TABLE IF NOT EXISTS happy_hours (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     product_id INTEGER NOT NULL,
     start_time DATETIME NOT NULL,
@@ -46,3 +46,4 @@ INSERT INTO products (barcode, brand, name, price, stock, happy_hour_price, imag
 ('123456789012', 'BrandA', 'ProductA', 9.99, 100, 7.99, 'path/to/imageA.jpg'),
 ('234567890123', 'BrandB', 'ProductB', 19.99, 50, 14.99, 'path/to/imageB.jpg'),
 ('345678901234', 'BrandC', 'ProductC', 29.99, 75, 24.99, 'path/to/imageC.jpg');
+('456789012345', 'BrandD', 'ProductD', 7.1423, 1, 7.1423, 'path/to/imageD.jpg');

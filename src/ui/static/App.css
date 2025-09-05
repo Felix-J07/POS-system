@@ -13,7 +13,7 @@
     padding: 1px;
     min-width: calc(600px + 80px + 24px + 30px); /* Ensures minimum width for content and sidebar */
     overflow: hidden; /* Prevents the main-container from overflowing */
-    margin-left: 80px; /* Pushes content to the right */
+    margin-left: 100px; /* Pushes content to the right */
 }
 
 @media (prefers-reduced-motion: no-preference) {

@@ -193,6 +193,8 @@
 }
 
 .cart-checkout button {
+    border-color: black;
+    color: white;
     flex: 1 1 0;
     margin: 0;
     min-width: 0;

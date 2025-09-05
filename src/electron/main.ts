@@ -1,8 +1,8 @@
 import { app, BrowserWindow, ipcMain } from "electron"
 import * as path from "path";
-import { GetProducts } from "./database.js";
 import { isDev } from "./util.js";
 import log from "electron-log";
+import { GetProducts } from "./database.js";
 
 // Change log levels
 log.transports.console.level = "silly"; // everything goes to terminal
