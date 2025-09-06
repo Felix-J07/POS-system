@@ -17,6 +17,7 @@ type CartType = {
     cartProducts: {
         product: Product, // Product details
         amount: number, // Amount of this product in the cart
+        price: number // Price for product when added in the cart
     }[],
     totalPrice: number, // Total price of the cart
 }
@@ -48,14 +49,13 @@ type HappyHour = {
     endTime: Date
 }
 
-type Note = {
-    product: Product,
-    note: string
-}
-
 interface Window {
     electron: {
         get_products: () => Promise<Product[]>;
-        //
+        add_product: (product: Product) => Promise<void>;
+        update_product: (product: Product) => Promise<void>;
+        delete_product: (productId: number) => Promise<void>;
+        // get_sales: () => Promise<Sale[]>;
+        // add_sale: (sale: Sale) => Promise<void>;
     }
 }

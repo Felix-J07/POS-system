@@ -1,0 +1,213 @@
+.product-modal {
+    all: unset;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    visibility: visible;
+    opacity: 1;
+    transition: opacity 0.3s ease;
+    background: "rgba(0,0,0,0.5)";
+    backdrop-filter: blur(4px); /* subtle blur for depth */
+}
+
+.product-modal-content {
+    all: unset;
+    background: #fff;
+    padding: 20px;
+    margin: "10vh auto";
+    border-radius: 12px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+    border-radius: 8px;
+    max-width: 800px;
+    max-height: 90vh;
+    animation: fadeInScale 0.3s ease;
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
+@keyframes fadeInScale {
+    from {
+        opacity: 0;
+        transform: scale(0.95);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+.product-modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 24px;
+}
+
+.product-modal-header h2 {
+    font-size: 20px;
+    font-weight: 600;
+    margin: 0;
+}
+
+.product-modal-header span {
+    font-size: 20px;
+    color: #666;
+    cursor: pointer;
+    transition: color 0.2s ease;
+}
+
+.product-modal-header span:hover {
+    color: #000;
+}
+
+.product-form label {
+    display: block;
+    margin-bottom: 16px;
+    font-size: 14px;
+    color: #444;
+}
+
+.product-form input {
+    width: 100%;
+    padding: 10px 12px;
+    margin-top: 6px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    box-sizing: border-box;
+    font-size: 14px;
+    background-color: #f9f9f9;
+    color: #333;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.product-form input:focus {
+    border-color: #007bff;
+    box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.2);
+    outline: none;
+}
+
+.product-form-buttons {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    margin-top: 24px;
+}
+
+.save-button,
+.cancel-button,
+.add-timestamp,
+.delete-button {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.2s ease, color 0.2s ease;
+}
+
+.save-button {
+    background: #007bff;
+    color: #fff;
+}
+
+.save-button:hover {
+    background: #0056b3;
+}
+
+.cancel-button {
+    background: #f0f0f0;
+    color: #333;
+}
+
+.cancel-button:hover {
+    background: #e0e0e0;
+}
+
+.delete-button {
+    margin-right: auto;
+    background: #dc3545;
+    color: #fff;
+}
+
+.delete-button:hover {
+    background: #a71d2a;
+}
+
+/* Chrome, Safari, Edge (step number input (Up down buttons)) */
+input[type=number]::-webkit-inner-spin-button,
+input[type=number]::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+.happy-hour-section {
+    margin-top: 24px;
+}
+
+.happy-hour-section h4 {
+    margin-bottom: 12px;
+    font-size: 16px;
+    font-weight: 600;
+    color: #333;
+}
+
+.timestamp-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 12px;
+}
+
+.timestamp-row input[type="datetime-local"] {
+    margin-top: 0px;
+    padding: 8px;
+    padding-right: 0px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    font-size: 14px;
+    background-color: #f9f9f9;
+    color: #333;
+    flex: 1 1 0;
+    box-sizing: border-box;
+}
+
+.timestamp-row .remove-timestamp {
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: white;
+    flex: 0 0 auto;
+}
+
+.timestamp-row .remove-timestamp:hover {
+    color: red;
+    cursor: pointer;
+}
+
+.add-timestamp {
+    display: flex;
+    align-items: center;   /* vertical centering */
+    gap: 6px;              /* spacing between icon and text */
+    background-color: #007bff;
+    color: white;
+    padding: 8px 12px;
+    border: none;
+    border-radius: 6px;
+    font-size: 14px;
+    cursor: pointer;
+    margin-top: 8px;
+    justify-self: center;
+}
+
+.add-timestamp:hover {
+    background-color: #0056b3;
+}

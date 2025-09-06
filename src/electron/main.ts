@@ -2,7 +2,7 @@ import { app, BrowserWindow, ipcMain } from "electron"
 import * as path from "path";
 import { isDev } from "./util.js";
 import log from "electron-log";
-import { GetProducts } from "./database.js";
+import { GetProducts, AddProduct, UpdateProduct, DeleteProduct } from "./database.js";
 
 // Change log levels
 log.transports.console.level = "silly"; // everything goes to terminal
@@ -35,6 +35,24 @@ app.on('ready', () => {
     ipcMain.handle("get-products", async (event, argz) => {
         const products = await GetProducts();
         return products;
+    });
+
+    ipcMain.handle("add-product", async (event, product) => {
+        const confirmation = await AddProduct(product);
+        log.info("Product added");
+        return confirmation;
+    });
+
+    ipcMain.handle("update-product", async (event, product) => {
+        const confirmation = await UpdateProduct(product);
+        log.info("Product updated");
+        return confirmation;
+    });
+
+    ipcMain.handle("delete-product", async (event, productId) => {
+        const confirmation = await DeleteProduct(productId);
+        log.info("Product deleted");
+        return confirmation;
     });
 });
 

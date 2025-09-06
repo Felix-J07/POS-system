@@ -1,32 +1,37 @@
+import { Link } from 'react-router';
 import './static/Checkout.css';
 
 type Props = {
-    cart: CartType,
-    setCart: React.Dispatch<React.SetStateAction<CartType>>,
     sale: Sale | null,
     setSales: React.Dispatch<React.SetStateAction<Sale | null>>,
+    setCart: React.Dispatch<React.SetStateAction<CartType>>,
 }
 
-function Checkout({ cart, setCart, sale, setSales }: Props) {
+function Checkout({ sale, setSales, setCart }: Props) {
     if (!sale) {
         return <div className="checkout-container"><h2>Ingen varer i kurven</h2></div>;
     }
+
+    function confirmPayment() {
+        setCart({ cartProducts: [] as CartType['cartProducts'], totalPrice: 0 });
+    }
+
     return (
         <div className="checkout-container">
             <h2>Betaling</h2>
             <div className="cart-items">
-                {cart.cartProducts.map(({ product, amount }) => (
+                {sale.soldProducts.map(({ product, quantity, price }) => (
                     <div key={product.id} className="cart-item">
                         <span>{product.name}</span>
-                        <span>{amount} x {product.price.toFixed(2)}</span>
+                        <span>{quantity} x {price.toFixed(2)}</span>
                     </div>
                 ))}
             </div>
             <div className="total-price-container">
                 <span>Total pris: </span>
-                <span>{cart.totalPrice.toFixed(2)} kr</span>
+                <span>{sale.total_sale_price.toFixed(2)} kr</span>
             </div>
-            <button id="confirm-button">Bekræft betaling</button>
+            <button id="confirm-button" onClick={confirmPayment}><Link to="/" style={{ color: 'white' }}>Bekræft betaling</Link></button>
         </div>
     );
 }

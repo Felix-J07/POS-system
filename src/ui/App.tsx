@@ -8,11 +8,26 @@ import Checkout from './Checkout'
 import Storage from './Storage'
 import Statistics from './Statistics'
 import Settings from './Settings'
+import { GetProducts } from './database'
 
 function App() {  
   const [products, setProducts] = useState<Product[]>([]) // Array of products from the database
+  // Update product prices on product cards
+  useEffect(() => {
+    const interval = setInterval(() => {
+      GetProducts({ setProducts });
+    }, 30000);
+    return () => clearInterval(interval);
+  }, []);
   
   const [cart, setCart] = useState<CartType>({ cartProducts: [] as CartType['cartProducts'], totalPrice: 0 }) // Cart containing products added to the cart
+  // Update cart prices
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCart(prevCart => ({ ...prevCart }));
+    }, 30000);
+    return () => clearInterval(interval);
+  }, []);
 
   const [sale, setSale] = useState<Sale | null>(null) // Current sale being processed in checkout
 
@@ -32,7 +47,7 @@ function App() {
       <div className="main-container">
         <Routes>
           <Route path="/" element={<Index products={products} cart={cart} setCart={setCart} setProducts={setProducts} setSale={setSale} />} />
-          <Route path="/checkout" element={<Checkout cart={cart} setCart={setCart} sale={sale} setSales={setSale} />} />
+          <Route path="/checkout" element={<Checkout setCart={setCart} sale={sale} setSales={setSale} />} />
           <Route path="/storage" element={<Storage products={products} setProducts={setProducts} />} />
           <Route path="/statistics" element={<Statistics />} />
           <Route path="/settings" element={<Settings />} />

@@ -7,3 +7,15 @@ export function GetProducts({ setProducts }: { setProducts: React.Dispatch<React
         setProducts(products);
     });
 }
+
+export function AddProduct(product: Product, setProducts: React.Dispatch<React.SetStateAction<Product[]>>) {
+    window.electron.add_product(product).then(() => GetProducts({ setProducts }));
+}
+
+export function UpdateProduct(product: Product, setProducts: React.Dispatch<React.SetStateAction<Product[]>>) {
+    window.electron.update_product(product).then(() => GetProducts({ setProducts }));
+}
+
+export function DeleteProduct(productId: number, setProducts: React.Dispatch<React.SetStateAction<Product[]>>) {
+    window.electron.delete_product(productId).then(() => GetProducts({ setProducts }));
+}

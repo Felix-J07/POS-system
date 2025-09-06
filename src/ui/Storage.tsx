@@ -1,71 +1,50 @@
 import { GetProducts } from "./database";
-import './static/storage.css';
+import { GetPrice } from './helpers';
+import './static/Storage.css';
 import { Card } from "./product_card";
 import { CirclePlus } from 'lucide-react';
+import { useState } from "react";
+import { ProductModal } from "./product_modal";
 
-type Props = {
+type StorageProps = {
     products: Product[],
     setProducts: React.Dispatch<React.SetStateAction<Product[]>>
 }
 
-function Storage({ products, setProducts }: Props) {
-    return (
-        <div className="storage-container">
-            <div className="storage-header">
-                <h2>Varelager</h2>
-                <div className="storage-reload">
-                    <button className="update-products" onClick={() => GetProducts({ setProducts })}>Opdater Produktliste</button>
-                </div>
-            </div>
-            <div className="product-list">
-                <div className="product-card" onClick={() => {/* Modal for adding product */}}>
-                    <h3>Tilføj Produkt</h3>
-                    <CirclePlus className="product-image" style={{ background: 'none', marginBottom: '30px' }} />
-                    
-                </div>
-                {products.map((product) => (
-                    Card(product, () => {/*ProductModal(product)*/})
-                ))}
-            </div>
-        </div>
-    );
-}
+function Storage({ products, setProducts }: StorageProps) {
+    const [modalVisible, setModalVisible] = useState(false);
+    const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
 
-function ProductModal(product: Product) {
+    const emptyProduct = {id: -1, barcode: "", brand: "", name: "", price: 0, stock: 0, happy_hour_price: 0, happy_hour_timestamps: []};
+
     return (
-        <div className="product-modal">
-            <h2>Rediger Produkt</h2>
-            <form className="product-form">
-                <label>
-                    Navn:
-                    <input type="text" defaultValue={product.name} />
-                </label>
-                <label>
-                    Mærke:
-                    <input type="text" defaultValue={product.brand} />
-                </label>
-                <label>
-                    Stregkode:
-                    <input type="text" defaultValue={product.barcode} />
-                </label>
-                <label>
-                    Pris:
-                    <input type="number" step="0.01" defaultValue={product.price} />
-                </label>
-                <label>
-                    Lager:
-                    <input type="number" defaultValue={product.stock} />
-                </label>
-                <label>
-                    Billede URL:
-                    <input type="text" defaultValue={product.image} />
-                </label>
-                <div className="product-form-buttons">
-                    <button type="submit" className="save-button">Gem</button>
-                    <button type="button" className="cancel-button">Annuller</button>
+        <>
+            <div className="storage-container">
+                <div className="storage-header">
+                    <h2>Varelager</h2>
+                    <div className="storage-reload">
+                        <button className="update-products" onClick={() => GetProducts({ setProducts })}>Opdater Produktliste</button>
+                    </div>
                 </div>
-            </form>
-        </div>
+                <div className="product-list">
+                    <div className="product-card" onClick={() => {
+                            setModalVisible(true);
+                            setSelectedProduct(emptyProduct);
+                        }}>
+                        <h3>Tilføj Produkt</h3>
+                        <CirclePlus className="product-image" style={{ background: 'none', marginBottom: '30px' }} />
+                        
+                    </div>
+                    {products.map((product) => (
+                        Card(product, () => {
+                            setModalVisible(true);
+                            setSelectedProduct(product);
+                        })
+                    ))}
+                </div>
+            </div>
+            {modalVisible && selectedProduct && ProductModal({ selectedProduct, setSelectedProduct, setModalVisible, setProducts })}
+        </>
     );
 }
 

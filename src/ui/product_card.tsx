@@ -1,4 +1,5 @@
 import './static/product_card.css';
+import { GetPrice } from './helpers'
 
 export function Card(product: Product, onClick?: () => void): React.JSX.Element {
     return (
@@ -11,7 +12,7 @@ export function Card(product: Product, onClick?: () => void): React.JSX.Element 
                 <p className="product-name">{product.name}</p>
                 <div className="product-stock-and-price">
                     <span className="product-stock">På lager: {product.stock}</span>
-                    <span className="product-price">Pris: {product.price.toFixed(2)} kr</span>
+                    <span className="product-price">Pris: {GetPrice(product).toFixed(2)} kr</span>
                 </div>
             </div>
         </div>

@@ -2,7 +2,7 @@ import './static/Cart.css'
 import type React from 'react'
 import { Trash } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import { GetProducts } from './database';
+import { GetPrice } from './helpers';
 
 type CartProps = {
   products: Product[];
@@ -107,7 +107,7 @@ function productDiv(product: Product, amount: number, cart: CartType, setCart: R
   );
 }
 
-function SaleConvert(cart: CartType) {
+function SaleConvert(cart: CartType): Sale | null {
   if (cart.cartProducts.length < 1) return null;
   let sale: Sale = {
     datetime: new Date().toISOString(),
@@ -124,50 +124,50 @@ function SaleConvert(cart: CartType) {
 function RemoveFromCart(productId: number, cart: CartType, setCart: React.Dispatch<React.SetStateAction<CartType>>) {
   const { cartProducts } = cart; // Fetch current products in cart
   const updatedProducts = cartProducts.filter(item => item.product.id !== productId);
-  const updatedTotalPrice = updatedProducts.reduce((sum, item) => sum + GetPrice(item.product) * item.amount, 0);
+  const updatedTotalPrice = updatedProducts.reduce((sum, item) => sum + item.price * item.amount, 0);
   setCart({ cartProducts: updatedProducts, totalPrice: updatedTotalPrice });
 }
 
 export function AddToCart(newProduct: Product, cart: CartType, setCart: React.Dispatch<React.SetStateAction<CartType>>, amount?: number) {
   const index = cart.cartProducts.findIndex(cartproduct => cartproduct.product.id === newProduct.id);
   let updatedTotalPrice = cart.totalPrice;
+  const getPrice = GetPrice(newProduct);
   if (index === -1) {
     if (amount !== undefined && amount > 0) {
-      updatedTotalPrice += GetPrice(newProduct) * amount;
+      updatedTotalPrice += getPrice * amount;
     } else {
       amount = 1;
-      updatedTotalPrice += GetPrice(newProduct);
+      updatedTotalPrice += getPrice;
     }
-    setCart({ cartProducts: [{product: newProduct, amount: amount}, ...cart.cartProducts ], totalPrice: updatedTotalPrice})
+    setCart({ cartProducts: [{product: newProduct, amount: amount, price: getPrice}, ...cart.cartProducts ], totalPrice: updatedTotalPrice})
   } else {
     newProduct = cart.cartProducts[index].product;
     let updatedAmount = cart.cartProducts[index].amount;
+    const oldPrice = cart.cartProducts[index].price;
     if (amount !== undefined) {
       if (amount === 0) { return; }
+      const oldAmount = updatedAmount;
       updatedAmount += amount;
       if (updatedAmount > newProduct.stock) {
         updatedAmount = newProduct.stock;
+        updatedTotalPrice -= oldAmount * oldPrice;
+        return;
       } else if (updatedAmount < 1) {
         RemoveFromCart(newProduct.id, cart, setCart);
         return;
       }
-      updatedTotalPrice += GetPrice(newProduct) * (updatedAmount-amount);
+      updatedTotalPrice -= oldAmount * oldPrice;
+      updatedTotalPrice += getPrice * updatedAmount;
     } else {
       if (newProduct.stock > updatedAmount) {
+        updatedTotalPrice -= updatedAmount * oldPrice;
         updatedAmount += 1;
-        updatedTotalPrice += GetPrice(newProduct);
+        updatedTotalPrice += getPrice * updatedAmount;
       }
     }
     cart.cartProducts = cart.cartProducts.filter((cartProduct) => cartProduct.product.id !== newProduct.id)
-    setCart({ cartProducts: [{product: newProduct, amount: updatedAmount}, ...cart.cartProducts], totalPrice: updatedTotalPrice});
+    setCart({ cartProducts: [{product: newProduct, amount: updatedAmount, price: getPrice}, ...cart.cartProducts], totalPrice: updatedTotalPrice});
   }
-}
-
-function GetPrice(product: Product): number {
-  if (product.happy_hour_timestamps.some((timestamp) => timestamp.endTime.getTime() >= Date.now() && timestamp.startTime.getTime() <= Date.now())) {
-    return product.happy_hour_price;
-  }
-  return product.price;
 }
 
 export default Cart;

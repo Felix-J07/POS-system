@@ -35,15 +35,8 @@ CREATE TABLE IF NOT EXISTS happy_hours (
     FOREIGN KEY (product_id) REFERENCES products(id)
 );
 
-CREATE TABLE IF NOT EXISTS notes (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    product_id INTEGER,
-    note TEXT,
-    FOREIGN KEY (product_id) REFERENCES products(id)
-);
-
 INSERT INTO products (barcode, brand, name, price, stock, happy_hour_price, image) VALUES
 ('123456789012', 'BrandA', 'ProductA', 9.99, 100, 7.99, 'path/to/imageA.jpg'),
 ('234567890123', 'BrandB', 'ProductB', 19.99, 50, 14.99, 'path/to/imageB.jpg'),
-('345678901234', 'BrandC', 'ProductC', 29.99, 75, 24.99, 'path/to/imageC.jpg');
+('345678901234', 'BrandC', 'ProductC', 29.99, 75, 24.99, 'path/to/imageC.jpg'),
 ('456789012345', 'BrandD', 'ProductD', 7.1423, 1, 7.1423, 'path/to/imageD.jpg');
