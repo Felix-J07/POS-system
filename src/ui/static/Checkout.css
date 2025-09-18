@@ -1,6 +1,8 @@
 .checkout-container {
     padding: 30px;
     max-width: 600px;
+    max-height: 75vh;
+    overflow-y: auto;
     margin: auto;
     background: #fff;
     border-radius: 8px;
@@ -39,7 +41,6 @@
     font-size: 18px;
     margin-bottom: 20px;
     display: flex;
-    justify-content: space-between;
 }
 
 .total-price-container span {

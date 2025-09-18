@@ -1,16 +1,15 @@
 import { app, BrowserWindow, ipcMain } from "electron"
 import * as path from "path";
 import { isDev } from "./util.js";
-import log from "electron-log";
-import { GetProducts, AddProduct, UpdateProduct, DeleteProduct } from "./database.js";
+//import log from "electron-log";
+import { GetProducts, AddProduct, UpdateProduct, DeleteProduct, GetSales, AddSale, UpdateProductStock } from "./database.js";
 
 // Change log levels
-log.transports.console.level = "silly"; // everything goes to terminal
-log.transports.file.level = "info";     // only info+ goes to file
-Object.assign(console, log.functions);
+//log.transports.console.level = "silly"; // everything goes to terminal
+//log.transports.file.level = "info";     // only info+ goes to file
+//Object.assign(console, log.functions);
 
 app.on('ready', () => {
-    log.info("App is ready");
     let mainWindow = new BrowserWindow({
         // preload script
         webPreferences: {
@@ -32,26 +31,38 @@ app.on('ready', () => {
         mainWindow.webContents.openDevTools();
     }
 
-    ipcMain.handle("get-products", async (event, argz) => {
+    ipcMain.handle("get-products", async (event) => {
         const products = await GetProducts();
         return products;
     });
 
     ipcMain.handle("add-product", async (event, product) => {
         const confirmation = await AddProduct(product);
-        log.info("Product added");
         return confirmation;
     });
 
     ipcMain.handle("update-product", async (event, product) => {
         const confirmation = await UpdateProduct(product);
-        log.info("Product updated");
         return confirmation;
     });
 
     ipcMain.handle("delete-product", async (event, productId) => {
         const confirmation = await DeleteProduct(productId);
-        log.info("Product deleted");
+        return confirmation;
+    });
+
+    ipcMain.handle("get-sales", async (event, condition?: string, params?: any) => {
+        const sales = await GetSales(condition, params);
+        return sales;
+    });
+
+    ipcMain.handle("add-sale", async (event, sale) => {
+        const confirmation = await AddSale(sale);
+        return confirmation;
+    });
+
+    ipcMain.handle("update-product-stock", async (event, sale) => {
+        const confirmation = await UpdateProductStock(sale);
         return confirmation;
     });
 });

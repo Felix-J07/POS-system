@@ -13,9 +13,14 @@ CREATE TABLE IF NOT EXISTS products (
 
 CREATE TABLE IF NOT EXISTS sales (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
+    transaction_id INTEGER,
     product_id INTEGER NOT NULL,
     quantity INTEGER NOT NULL,
+    price_per_unit REAL NOT NULL,
     total_price REAL NOT NULL,
+    -- Indicates if the sale was a prize in a tournament
+    -- 0 = regular sale, 1 = prize
+    is_prize BOOLEAN NOT NULL DEFAULT 0,
     sale_date DATETIME DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (product_id) REFERENCES products(id)
 );

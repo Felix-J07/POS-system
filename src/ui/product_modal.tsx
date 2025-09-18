@@ -1,6 +1,7 @@
-import { X, Trash, Plus } from 'lucide-react';
+import { Trash, Plus } from 'lucide-react';
 import { AddProduct, UpdateProduct, DeleteProduct } from './database';
 import './static/product_modal.css';
+import type { JSX } from 'react';
 
 
 type ProductModalProps = {
@@ -10,7 +11,7 @@ type ProductModalProps = {
     setProducts: React.Dispatch<React.SetStateAction<Product[]>>
 }
 
-export function ProductModal({ selectedProduct, setSelectedProduct, setModalVisible, setProducts }: ProductModalProps) {
+export function ProductModal({ selectedProduct, setSelectedProduct, setModalVisible, setProducts }: ProductModalProps): JSX.Element {
     // Helper to update a timestamp in selectedProduct
     function updateTimestamp(index: number, field: 'startTime' | 'endTime', value: string) {
         if (!selectedProduct) return;
@@ -96,77 +97,69 @@ export function ProductModal({ selectedProduct, setSelectedProduct, setModalVisi
     }
     
     return (
-        <div className="product-modal" onMouseDown={() => setModalVisible(false) /*Closing the modal on click outside of the modal*/}>
-            <div className="product-modal-content" onMouseDown={e => e.stopPropagation() /*Prevents closing the modal when modal is clicked*/}>
-                <div className="product-modal-header">
-                    <h2>Rediger Produkt</h2>
-                    <span onClick={() => setModalVisible(false)}><X /></span>
-                </div>
-                <form className="product-form" onSubmit={HandleFormSubmit} onKeyDown={e => e.key === 'Enter' && e.preventDefault()}>
-                    <label>
-                        Navn:
-                        <input type="text" defaultValue={selectedProduct.name} name="name" />
-                    </label>
-                    <label>
-                        Mærke:
-                        <input type="text" defaultValue={selectedProduct.brand} name="brand" />
-                    </label>
-                    <label>
-                        Stregkode:
-                        <input type="text" defaultValue={selectedProduct.barcode} name="barcode" />
-                    </label>
-                    <label>
-                        Pris:
-                        <input type="number" min="0" step="0.01" defaultValue={selectedProduct.price} name="price" />
-                    </label>
-                    <label>
-                        Lager:
-                        <input type="number" min="0" step="1" defaultValue={selectedProduct.stock} name="stock" />
-                    </label>
-                    <label>
-                        Billede URL:
-                        <input type="text" defaultValue={selectedProduct.image} name="image" />
-                    </label>
-                    
-                    <div className="happy-hour-section">
-                        <label>
-                            Happy hour pris:
-                            <input type="number" min="0" step="0.01" defaultValue={selectedProduct.happy_hour_price} name="happy_hour_price" />
-                        </label>
-                        <h4>Happy Hour Timestamps</h4>
-                        {selectedProduct.happy_hour_timestamps.map((ts, index) => (
-                            <div key={index} className="timestamp-row">
-                                <input name="timestamp_index" type="hidden" value={index} />
-                                <input
-                                    type="datetime-local"
-                                    value={formatDate(ts.startTime)}
-                                    onChange={(e) => updateTimestamp(index, 'startTime', e.target.value)}
-                                    name={`startTime_${index}`}
-                                />
-                            <span>→</span>
-                            <input
-                                type="datetime-local"
-                                value={formatDate(ts.endTime)}
-                                onChange={(e) => updateTimestamp(index, 'endTime', e.target.value)}
-                                name={`endTime_${index}`}
-                            />
-                            <Trash className="remove-timestamp" onClick={() => removeTimestamp(index)} />
-                            </div>
-                        ))}
-                        <button type="button" className="add-timestamp" onClick={addTimestamp}><Plus /> Add Timestamp</button>
+        <form className="product-form" onSubmit={HandleFormSubmit} onKeyDown={e => e.key === 'Enter' && e.preventDefault()}>
+            <label>
+                Navn:
+                <input type="text" defaultValue={selectedProduct.name} name="name" />
+            </label>
+            <label>
+                Mærke:
+                <input type="text" defaultValue={selectedProduct.brand} name="brand" />
+            </label>
+            <label>
+                Stregkode:
+                <input type="text" defaultValue={selectedProduct.barcode} name="barcode" />
+            </label>
+            <label>
+                Pris:
+                <input type="number" min="0" step="0.01" defaultValue={selectedProduct.price} name="price" />
+            </label>
+            <label>
+                Lager:
+                <input type="number" min="0" step="1" defaultValue={selectedProduct.stock} name="stock" />
+            </label>
+            <label>
+                Billede URL:
+                <input type="text" defaultValue={selectedProduct.image} name="image" />
+            </label>
+            
+            <div className="happy-hour-section">
+                <label>
+                    Happy hour pris:
+                    <input type="number" min="0" step="0.01" defaultValue={selectedProduct.happy_hour_price} name="happy_hour_price" />
+                </label>
+                <h4>Happy Hour Timestamps</h4>
+                {selectedProduct.happy_hour_timestamps.map((ts, index) => (
+                    <div key={index} className="timestamp-row">
+                        <input name="timestamp_index" type="hidden" value={index} />
+                        <input
+                            type="datetime-local"
+                            value={formatDate(ts.startTime)}
+                            onChange={(e) => updateTimestamp(index, 'startTime', e.target.value)}
+                            name={`startTime_${index}`}
+                        />
+                    <span>→</span>
+                    <input
+                        type="datetime-local"
+                        value={formatDate(ts.endTime)}
+                        onChange={(e) => updateTimestamp(index, 'endTime', e.target.value)}
+                        name={`endTime_${index}`}
+                    />
+                    <Trash className="remove-timestamp" onClick={() => removeTimestamp(index)} />
                     </div>
-
-                    <div className="product-form-buttons">
-                        {selectedProduct.id && selectedProduct.id !== -1 && (
-                            <button type="button" className="delete-button" onClick={() => deleteProduct(selectedProduct.id)}>Slet</button>
-                        )}
-                            <button type="submit" className="save-button">Gem</button>
-                        <button type="button" className="cancel-button" onClick={() => setModalVisible(false)}>Annuller</button>
-                    </div>
-                </form>
+                ))}
+                <button type="button" className="add-timestamp" onClick={addTimestamp}><Plus /> Add Timestamp</button>
             </div>
-        </div>
-    )
+
+            <div className="product-form-buttons">
+                {selectedProduct.id && selectedProduct.id !== -1 && (
+                    <button type="button" className="delete-button" onClick={() => deleteProduct(selectedProduct.id)}>Slet</button>
+                )}
+                    <button type="submit" className="save-button">Gem</button>
+                <button type="button" className="cancel-button" onClick={() => setModalVisible(false)}>Annuller</button>
+            </div>
+        </form>
+    );
 }
 
 function formatDate(date: string | number | Date ): string {

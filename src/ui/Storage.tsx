@@ -1,9 +1,9 @@
 import { GetProducts } from "./database";
-import { GetPrice } from './helpers';
 import './static/Storage.css';
 import { Card } from "./product_card";
 import { CirclePlus } from 'lucide-react';
 import { useState } from "react";
+import { Modal } from "./modal";
 import { ProductModal } from "./product_modal";
 
 type StorageProps = {
@@ -43,7 +43,7 @@ function Storage({ products, setProducts }: StorageProps) {
                     ))}
                 </div>
             </div>
-            {modalVisible && selectedProduct && ProductModal({ selectedProduct, setSelectedProduct, setModalVisible, setProducts })}
+            {modalVisible && selectedProduct && <Modal setModalVisible={setModalVisible} modal_content={<ProductModal selectedProduct={selectedProduct} setSelectedProduct={setSelectedProduct} setModalVisible={setModalVisible} setProducts={setProducts} />} />}
         </>
     );
 }

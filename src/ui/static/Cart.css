@@ -161,6 +161,43 @@
     -moz-appearance: textfield;
 }
 
+.add-prize-button {
+    /* Add prize button needs to be small and centered and right above the cart checkout */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    margin-bottom: 5px;
+    width: 100px;
+
+    padding: 6px;
+    background: #f0f0f0;
+    border-radius: 8px;
+    box-sizing: border-box;
+
+    font-size: 13px;
+    font-weight: bold;
+
+    transition: background-color 0.2s, box-shadow 0.2s;
+
+
+    &:hover {
+        background: darken(#f0f0f0, 5%);
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        cursor: pointer;
+    }
+
+    &:active {
+        background: darken(#f0f0f0, 10%);
+        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+    }
+
+    button {
+        all: unset;
+        cursor: pointer;
+    }
+}
+
 .cart-product-price {
     font-weight: bold;
     font-size: 15px;

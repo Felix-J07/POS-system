@@ -1,8 +1,7 @@
-
 function Statistics() {
     return (
         <div>
-            Statistics works!
+            Statistics Page
         </div>
     );
 }

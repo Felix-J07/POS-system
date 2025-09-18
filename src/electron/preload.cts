@@ -13,5 +13,14 @@ electron.contextBridge.exposeInMainWorld('electron', {
     },
     delete_product: async (productId: number) => {
         return await electron.ipcRenderer.invoke("delete-product", productId);
+    },
+    get_sales: async (condition?: string, params?: any) => {
+        return await electron.ipcRenderer.invoke("get-sales", condition, params);
+    },
+    add_sale: async (sale: Sale) => {
+        return await electron.ipcRenderer.invoke("add-sale", sale);
+    },
+    update_product_stock: async (sale: Sale) => {
+        return await electron.ipcRenderer.invoke("update-product-stock", sale);
     }
 } satisfies Window['electron']);

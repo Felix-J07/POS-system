@@ -3,6 +3,10 @@ import type React from 'react'
 import { Trash } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { GetPrice } from './helpers';
+import { useState } from 'react';
+import { Modal } from './modal';
+import { Card } from './product_card';
+import './static/ProductShowcase.css';
 
 type CartProps = {
   products: Product[];
@@ -12,6 +16,7 @@ type CartProps = {
 };
 
 function Cart({ products, cart, setCart, setSale }: CartProps) {
+  const [modalVisible, setModalVisible] = useState(false);
   
   const { cartProducts, totalPrice } = cart;
 
@@ -38,51 +43,61 @@ function Cart({ products, cart, setCart, setSale }: CartProps) {
     event.currentTarget.style.borderColor = exists ? 'green' : 'red';
   };
 
+  const addPrizeModal = () => {
+    setModalVisible(true);
+    PrizeModal({ products, cart, setCart });
+  };
+
   return (
     <>
       <div className="cart">
-        <h3>Cart</h3>
+        <h3>Kurv</h3>
         <input autoFocus type="text" name="barcode" id="barcodeCartInput" placeholder="Stregkode:" onKeyUp={barcodeInput}/>
         <div className="cart-products">
-          {cartProducts.map(({product, amount}) => (
-            productDiv(product, amount, cart, setCart)))}
+          {cartProducts.map(({product, amount, is_prize}) => (
+            productDiv(product, amount, cart, setCart, is_prize)
+          ))}
         </div>
         <div className="cart-checkout">
+          <div className="add-prize-button">
+            <button type="button" onClick={addPrizeModal} style={{ color: '#333' }}>Tilføj præmie</button>
+          </div>
           <p>Total Price: {totalPrice.toFixed(2)}</p>
           <div className="cart-checkout-buttons">
             <button type="button" id="clearCart" onClick={() => setCart({ cartProducts: [], totalPrice: 0 })}>Ryd kurven</button>
-            <button type="button" id="checkout" onClick={() => setSale(SaleConvert(cart))}><Link to="/checkout" style={{ color: 'white' }}>Gå til betaling</Link></button>
+            <Link to="/checkout" style={{ color: 'white' }} id="checkout" onClick={() => setSale(SaleConvert(cart))}><button>Gå til betaling</button></Link>
           </div>
         </div>
       </div>
+      {modalVisible && <Modal setModalVisible={setModalVisible} modal_content={<PrizeModal products={products} cart={cart} setCart={setCart} />} />}
     </>
   );
 }
 
-function productDiv(product: Product, amount: number, cart: CartType, setCart: React.Dispatch<React.SetStateAction<CartType>>): React.JSX.Element {
+function productDiv(product: Product, amount: number, cart: CartType, setCart: React.Dispatch<React.SetStateAction<CartType>>, is_prize: boolean = false): React.JSX.Element {
   const reduceAmount = () => {
     if (amount <= 1) {
-      RemoveFromCart(product.id, cart, setCart);
+      RemoveFromCart(product.id, cart, setCart, is_prize);
       return;
     }
     cart.cartProducts.forEach((item) => {
-      if (item.product.id === product.id) {
+      if (item.product.id === product.id && item.is_prize === is_prize) {
         item.amount -= 1;
         setCart({ cartProducts: cart.cartProducts, totalPrice: cart.totalPrice - GetPrice(product) });
       }
     });
   };
   const increaseAmount = () => {
-    AddToCart(product, cart, setCart, 1);
+    AddToCart(product, cart, setCart, 1, is_prize);
   };
   const removeItem = () => {
     if (product.id !== null) {
-      RemoveFromCart(product.id, cart, setCart);
+      RemoveFromCart(product.id, cart, setCart, is_prize);
     }
   };
 
   return (
-    <div className="cart-product" key={product.id} id={`cart-product-${product.id}`}>
+    <div className="cart-product" key={`${product.id}-${is_prize ? 'prize' : 'regular'}`} id={`cart-product-${product.id}`}>
       <img src={product.image} alt={product.name} className="cart-product-image" />
       <div className="cart-product-info">
         <div className="cart-product-row cart-product-row-top">
@@ -99,7 +114,7 @@ function productDiv(product: Product, amount: number, cart: CartType, setCart: R
             <button type="button" className="qty-btn"data-id={product.id} onClick={increaseAmount}>+</button>
           </div>
           <div className="cart-product-price">
-            Pris: {(GetPrice(product) * amount).toFixed(2)} kr
+            Pris: {is_prize ? 0.00.toFixed(2) : (GetPrice(product) * amount).toFixed(2)} kr
           </div>
         </div>
       </div>
@@ -111,39 +126,45 @@ function SaleConvert(cart: CartType): Sale | null {
   if (cart.cartProducts.length < 1) return null;
   let sale: Sale = {
     datetime: new Date().toISOString(),
-    total_sale_price: parseFloat(cart.cartProducts.reduce((sum, item) => sum + GetPrice(item.product) * item.amount, 0).toFixed(2)),
-    soldProducts: cart.cartProducts.map(({ product, amount }) => ({
+    total_sale_price: parseFloat(cart.cartProducts.reduce((sum, item) => sum + (item.is_prize ? 0.00 : GetPrice(item.product) * item.amount), 0).toFixed(2)),
+    soldProducts: cart.cartProducts.map(({ product, amount, is_prize }) => ({
       product: product,
       quantity: amount,
-      price: parseFloat(GetPrice(product).toFixed(2)) // Get the price at the time of sale
+      price: is_prize ? 0.00 : parseFloat(GetPrice(product).toFixed(2)), // Get the price at the time of sale
+      is_prize: is_prize ? 1 : 0
     }))
   }
   return sale;
 }
 
-function RemoveFromCart(productId: number, cart: CartType, setCart: React.Dispatch<React.SetStateAction<CartType>>) {
+function RemoveFromCart(productId: number, cart: CartType, setCart: React.Dispatch<React.SetStateAction<CartType>>, is_prize: boolean) {
   const { cartProducts } = cart; // Fetch current products in cart
-  const updatedProducts = cartProducts.filter(item => item.product.id !== productId);
+  const updatedProducts = cartProducts.filter(item => item.product.id !== productId || item.is_prize !== is_prize); // Remove the product with the given ID
   const updatedTotalPrice = updatedProducts.reduce((sum, item) => sum + item.price * item.amount, 0);
   setCart({ cartProducts: updatedProducts, totalPrice: updatedTotalPrice });
 }
 
-export function AddToCart(newProduct: Product, cart: CartType, setCart: React.Dispatch<React.SetStateAction<CartType>>, amount?: number) {
-  const index = cart.cartProducts.findIndex(cartproduct => cartproduct.product.id === newProduct.id);
+export function AddToCart(product: Product, cart: CartType, setCart: React.Dispatch<React.SetStateAction<CartType>>, amount?: number, is_prize: boolean = false) {
+  let newProduct: Product = { ...product }; // Create a copy of the product to avoid direct mutations
+  if (is_prize) { newProduct.name = newProduct.name + " (Præmie)"; }
+
+  const index = cart.cartProducts.findIndex(cartproduct => cartproduct.product.id === newProduct.id && cartproduct.is_prize === is_prize);
   let updatedTotalPrice = cart.totalPrice;
-  const getPrice = GetPrice(newProduct);
+  const getPrice = is_prize ? 0 : GetPrice(newProduct);
   if (index === -1) {
+    if (newProduct.stock < 1) { return; }
     if (amount !== undefined && amount > 0) {
       updatedTotalPrice += getPrice * amount;
     } else {
       amount = 1;
       updatedTotalPrice += getPrice;
     }
-    setCart({ cartProducts: [{product: newProduct, amount: amount, price: getPrice}, ...cart.cartProducts ], totalPrice: updatedTotalPrice})
+    setCart({ cartProducts: [{product: newProduct, amount: amount, price: getPrice, is_prize: is_prize}, ...cart.cartProducts ], totalPrice: updatedTotalPrice})
   } else {
     newProduct = cart.cartProducts[index].product;
     let updatedAmount = cart.cartProducts[index].amount;
     const oldPrice = cart.cartProducts[index].price;
+    const is_prize = cart.cartProducts[index].is_prize;
     if (amount !== undefined) {
       if (amount === 0) { return; }
       const oldAmount = updatedAmount;
@@ -153,7 +174,7 @@ export function AddToCart(newProduct: Product, cart: CartType, setCart: React.Di
         updatedTotalPrice -= oldAmount * oldPrice;
         return;
       } else if (updatedAmount < 1) {
-        RemoveFromCart(newProduct.id, cart, setCart);
+        RemoveFromCart(newProduct.id, cart, setCart, is_prize);
         return;
       }
       updatedTotalPrice -= oldAmount * oldPrice;
@@ -165,9 +186,25 @@ export function AddToCart(newProduct: Product, cart: CartType, setCart: React.Di
         updatedTotalPrice += getPrice * updatedAmount;
       }
     }
-    cart.cartProducts = cart.cartProducts.filter((cartProduct) => cartProduct.product.id !== newProduct.id)
-    setCart({ cartProducts: [{product: newProduct, amount: updatedAmount, price: getPrice}, ...cart.cartProducts], totalPrice: updatedTotalPrice});
+    cart.cartProducts = cart.cartProducts.filter((_, idx) => idx !== index);
+    setCart({ cartProducts: [{product: newProduct, amount: updatedAmount, price: getPrice, is_prize: is_prize}, ...cart.cartProducts], totalPrice: updatedTotalPrice});
   }
+}
+
+//function productDiv(product: Product, amount: number, cart: CartType, setCart: React.Dispatch<React.SetStateAction<CartType>>)
+function PrizeModal({ products, cart, setCart }: { products: Product[], cart: CartType, setCart: React.Dispatch<React.SetStateAction<CartType>> }): React.JSX.Element {
+  const AddPrizeToCart = (product: Product) => {
+    AddToCart(product, cart, setCart, 1, true);
+  };
+
+  return (
+    <div>
+      <h2>Tilføj præmie</h2>
+      <div className='product-grid'>
+        { products.map((product) => Card(product, () => { AddPrizeToCart(product); })) }
+      </div>
+    </div>
+  );
 }
 
 export default Cart;

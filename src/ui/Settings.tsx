@@ -2,7 +2,7 @@
 function Settings() {
     return (
         <div>
-            Settings works!
+            Settings page
         </div>
     );
 }

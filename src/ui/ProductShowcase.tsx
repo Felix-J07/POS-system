@@ -8,9 +8,10 @@ type ProductShowcaseProps = {
     cart: CartType;
     setCart: React.Dispatch<React.SetStateAction<CartType>>;
     setProducts: React.Dispatch<React.SetStateAction<Product[]>>;
+    onAddToCart?: (product: Product) => void; // Optional callback for adding a product to the cart
 }
 
-function ProductShowcase({ products, cart, setCart, setProducts }: ProductShowcaseProps) {
+function ProductShowcase({ products, cart, setCart, setProducts, onAddToCart }: ProductShowcaseProps) {
     return (
         <div className="product-showcase">
             <div className="product-showcase-header">

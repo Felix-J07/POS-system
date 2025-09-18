@@ -1,4 +1,4 @@
-.product-modal {
+/*.product-modal {
     all: unset;
     position: fixed;
     top: 0;
@@ -13,7 +13,7 @@
     opacity: 1;
     transition: opacity 0.3s ease;
     background: "rgba(0,0,0,0.5)";
-    backdrop-filter: blur(4px); /* subtle blur for depth */
+    backdrop-filter: blur(4px);
 }
 
 .product-modal-content {
@@ -64,7 +64,7 @@
 
 .product-modal-header span:hover {
     color: #000;
-}
+}*/
 
 .product-form label {
     display: block;

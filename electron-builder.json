@@ -1,7 +1,7 @@
 {
     "appId": "com.f-jensen.possystem",
     "files": ["dist-electron", "dist-react"],
-    "extraResources": ["dist-electron/preload.cjs"],
+    "extraResources": ["dist-electron/preload.cjs", "public/database.db"],
     "icon": "./desktopIcon.png",
     "mac": {
         "target": "dmg"

@@ -9,25 +9,32 @@ import Storage from './Storage'
 import Statistics from './Statistics'
 import Settings from './Settings'
 import { GetProducts } from './database'
+import { GetPrice } from './helpers'
 
 function App() {  
   const [products, setProducts] = useState<Product[]>([]) // Array of products from the database
-  // Update product prices on product cards
+  // Set product on product cards when app starts up
   useEffect(() => {
-    const interval = setInterval(() => {
-      GetProducts({ setProducts });
-    }, 30000);
-    return () => clearInterval(interval);
+    GetProducts({ setProducts });
   }, []);
   
   const [cart, setCart] = useState<CartType>({ cartProducts: [] as CartType['cartProducts'], totalPrice: 0 }) // Cart containing products added to the cart
-  // Update cart prices
+  // Update cart prices if product prices change in the database
   useEffect(() => {
-    const interval = setInterval(() => {
-      setCart(prevCart => ({ ...prevCart }));
-    }, 30000);
-    return () => clearInterval(interval);
-  }, []);
+    setCart(prevCart => {
+      const updatedCartProducts = prevCart.cartProducts.map(item => {
+        const updatedProduct = products.find(p => p.id === item.product.id);
+        return updatedProduct
+          ? { product: updatedProduct, amount: item.amount <= updatedProduct.stock ? item.amount : updatedProduct.stock, price: GetPrice(updatedProduct), is_prize: item.is_prize }
+          : item;
+      });
+      // Recalculate total price in case product prices changed
+      const updatedTotalPrice = updatedCartProducts.reduce(
+        (sum, item) => sum + item.price * item.amount, 0
+      );
+      return { cartProducts: updatedCartProducts, totalPrice: updatedTotalPrice };
+    });
+  }, [products]);
 
   const [sale, setSale] = useState<Sale | null>(null) // Current sale being processed in checkout
 
@@ -47,7 +54,7 @@ function App() {
       <div className="main-container">
         <Routes>
           <Route path="/" element={<Index products={products} cart={cart} setCart={setCart} setProducts={setProducts} setSale={setSale} />} />
-          <Route path="/checkout" element={<Checkout setCart={setCart} sale={sale} setSales={setSale} />} />
+          <Route path="/checkout" element={<Checkout setCart={setCart} sale={sale} setSales={setSale} setProducts={setProducts} />} />
           <Route path="/storage" element={<Storage products={products} setProducts={setProducts} />} />
           <Route path="/statistics" element={<Statistics />} />
           <Route path="/settings" element={<Settings />} />

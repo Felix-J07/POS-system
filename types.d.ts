@@ -18,17 +18,20 @@ type CartType = {
         product: Product, // Product details
         amount: number, // Amount of this product in the cart
         price: number // Price for product when added in the cart
+        is_prize: boolean // Indicates if the product is a prize in a tournament
     }[],
     totalPrice: number, // Total price of the cart
 }
 
 type Sale = {
     datetime: string, // ISO date string
-    total_sale_price: number,
+    total_sale_price: number, // Total price of the sale
+    payment_method?: 'cash' | 'card' | 'mobilepay', // Payment method used
     soldProducts: {
         product: Product,
-        quantity: number,
-        price: number // Price per unit at the time of sale
+        quantity: number, // Quantity of this product sold in the sale
+        price: number, // Price per unit at the time of sale
+        is_prize: number // Indicates if the product is a prize in a tournament
     }[] // Array of products sold in this sale
 }
 
@@ -40,6 +43,7 @@ type SaleStatistics = {
         product: Product,
         quantity: number,
         price: number // Price per unit at the time of sale
+        is_prize: boolean // Indicates if the product is a prize in a tournament
     } // Array of products sold in this sale
 }
 
@@ -55,7 +59,8 @@ interface Window {
         add_product: (product: Product) => Promise<void>;
         update_product: (product: Product) => Promise<void>;
         delete_product: (productId: number) => Promise<void>;
-        // get_sales: () => Promise<Sale[]>;
-        // add_sale: (sale: Sale) => Promise<void>;
+        get_sales: (condition?: string, params?: any) => Promise<SaleStatistics[]>;
+        add_sale: (sale: Sale) => Promise<void>;
+        update_product_stock: (sale: Sale) => Promise<boolean>;
     }
 }

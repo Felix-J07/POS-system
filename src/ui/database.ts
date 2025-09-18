@@ -19,3 +19,15 @@ export function UpdateProduct(product: Product, setProducts: React.Dispatch<Reac
 export function DeleteProduct(productId: number, setProducts: React.Dispatch<React.SetStateAction<Product[]>>) {
     window.electron.delete_product(productId).then(() => GetProducts({ setProducts }));
 }
+
+export async function GetSales(condition?: string, params?: any): Promise<SaleStatistics[]> {
+    return await window.electron.get_sales(condition, params);
+}
+
+export function AddSale(sale: Sale) {
+    window.electron.add_sale(sale);
+}
+
+export function UpdateProductStock(sale: Sale, setProducts: React.Dispatch<React.SetStateAction<Product[]>>) {
+    window.electron.update_product_stock(sale).then(() => GetProducts({ setProducts }));
+}
