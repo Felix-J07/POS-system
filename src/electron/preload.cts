@@ -22,5 +22,8 @@ electron.contextBridge.exposeInMainWorld('electron', {
     },
     update_product_stock: async (sale: Sale) => {
         return await electron.ipcRenderer.invoke("update-product-stock", sale);
+    },
+    export_database: async () => {
+        return await electron.ipcRenderer.invoke("export-database");
     }
 } satisfies Window['electron']);

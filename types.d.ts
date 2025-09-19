@@ -62,5 +62,6 @@ interface Window {
         get_sales: (condition?: string, params?: any) => Promise<SaleStatistics[]>;
         add_sale: (sale: Sale) => Promise<void>;
         update_product_stock: (sale: Sale) => Promise<boolean>;
+        export_database: () => Promise<void>;
     }
 }

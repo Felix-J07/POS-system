@@ -31,3 +31,9 @@ export function AddSale(sale: Sale) {
 export function UpdateProductStock(sale: Sale, setProducts: React.Dispatch<React.SetStateAction<Product[]>>) {
     window.electron.update_product_stock(sale).then(() => GetProducts({ setProducts }));
 }
+
+export function ExportDatabase() {
+    // Logic to export the database
+    console.log("Exporting database...");
+    window.electron.export_database();
+}

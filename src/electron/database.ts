@@ -1,7 +1,7 @@
 import sqlite3 from "sqlite3";
 //import log from "electron-log";
 import path, { resolve } from "path";
-import { app } from "electron";
+import { app, dialog } from "electron";
 import { isDev } from "./util.js";
 import fs from 'fs';
 
@@ -287,6 +287,48 @@ export async function UpdateProductStock(sale: Sale): Promise<boolean> {
       }
     });
   });
+}
+
+export async function ExportDatabase(window: Electron.BrowserWindow): Promise<void> {
+  try {
+    const result = await dialog.showSaveDialog(window, {
+      title: "Download path for database",
+      properties: ["createDirectory", "showOverwriteConfirmation"],
+      defaultPath: "database.db",
+      filters: [
+        { name: "Database Files", extensions: ["db"] },
+        { name: "All Files", extensions: ["*"] }
+      ]
+    });
+    if (result.canceled || !result.filePath || result.filePath === "") {
+      dialog.showErrorBox("Exportering af database", "Denne filsti er desværre ikke valid");
+      return;
+    }
+    // Ensure the file has .db extension
+    let exportPath = result.filePath;
+    if (!exportPath.endsWith('.db')) {
+      exportPath += '.db';
+    }
+    fs.copyFile(dbPath, exportPath, (err) => {
+      if (err) {
+        dialog.showErrorBox("Exportering af database", "Der opstod desværre en fejl ved exportering af database");
+      } else {
+        // Set the modification time to now
+        const now = new Date();
+        fs.utimes(exportPath, now, now, () => {
+          dialog.showMessageBox(window, {
+            type: "info",
+            title: "Eksport gennemført",
+            message: "Databasen blev eksporteret succesfuldt til: " + exportPath
+          });
+        });
+      }
+    });
+    return;
+  } catch {
+    dialog.showErrorBox("Exportering af database", "Fejl");
+    return;
+  }
 }
 
 export default db;

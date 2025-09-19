@@ -1,10 +1,15 @@
+import { ExportDatabase } from './database.ts';
 
 function Settings() {
     return (
         <div>
-            Settings page
+            <button onClick={exportDatabase}>Eksporter Database</button>
         </div>
     );
+}
+
+function exportDatabase() {
+    ExportDatabase();
 }
 
 export default Settings;
