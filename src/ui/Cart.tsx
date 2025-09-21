@@ -2,7 +2,7 @@ import './static/Cart.css'
 import type React from 'react'
 import { Trash } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import { GetPrice } from './helpers';
+import { GetPriceAndHappyHour } from './helpers';
 import { useState } from 'react';
 import { Modal } from './modal';
 import { Card } from './product_card';
@@ -83,7 +83,7 @@ function productDiv(product: Product, amount: number, cart: CartType, setCart: R
     cart.cartProducts.forEach((item) => {
       if (item.product.id === product.id && item.is_prize === is_prize) {
         item.amount -= 1;
-        setCart({ cartProducts: cart.cartProducts, totalPrice: cart.totalPrice - GetPrice(product) });
+        setCart({ cartProducts: cart.cartProducts, totalPrice: cart.totalPrice - item.price });
       }
     });
   };
@@ -114,7 +114,7 @@ function productDiv(product: Product, amount: number, cart: CartType, setCart: R
             <button type="button" className="qty-btn"data-id={product.id} onClick={increaseAmount}>+</button>
           </div>
           <div className="cart-product-price">
-            Pris: {is_prize ? 0.00.toFixed(2) : (GetPrice(product) * amount).toFixed(2)} kr
+            Pris: {is_prize ? 0.00.toFixed(2) : (GetPriceAndHappyHour(product)[0] * amount).toFixed(2)} kr
           </div>
         </div>
       </div>
@@ -126,12 +126,13 @@ function SaleConvert(cart: CartType): Sale | null {
   if (cart.cartProducts.length < 1) return null;
   let sale: Sale = {
     datetime: new Date().toISOString(),
-    total_sale_price: parseFloat(cart.cartProducts.reduce((sum, item) => sum + (item.is_prize ? 0.00 : GetPrice(item.product) * item.amount), 0).toFixed(2)),
-    soldProducts: cart.cartProducts.map(({ product, amount, is_prize }) => ({
+    total_sale_price: parseFloat(cart.cartProducts.reduce((sum, item) => sum + (item.is_prize ? 0.00 : item.price * item.amount), 0).toFixed(2)),
+    soldProducts: cart.cartProducts.map(({ product, amount, price, is_prize, is_happy_hour_purchase }) => ({
       product: product,
       quantity: amount,
-      price: is_prize ? 0.00 : parseFloat(GetPrice(product).toFixed(2)), // Get the price at the time of sale
-      is_prize: is_prize ? 1 : 0
+      price: is_prize ? 0.00 : parseFloat(price.toFixed(2)), // Get the price at the time of sale
+      is_prize: is_prize ? 1 : 0,
+      is_happy_hour_purchase: is_happy_hour_purchase
     }))
   }
   return sale;
@@ -144,50 +145,88 @@ function RemoveFromCart(productId: number, cart: CartType, setCart: React.Dispat
   setCart({ cartProducts: updatedProducts, totalPrice: updatedTotalPrice });
 }
 
+// Adding a product to the cart if enough stock
 export function AddToCart(product: Product, cart: CartType, setCart: React.Dispatch<React.SetStateAction<CartType>>, amount?: number, is_prize: boolean = false) {
   let newProduct: Product = { ...product }; // Create a copy of the product to avoid direct mutations
+  
+  // If the product is a prize it is added to the cart with (Præmie) appended to the name
   if (is_prize) { newProduct.name = newProduct.name + " (Præmie)"; }
 
+  // Finding the index of the added product in the cart (the same product can have to instances in the cart, one prize one payed)
   const index = cart.cartProducts.findIndex(cartproduct => cartproduct.product.id === newProduct.id && cartproduct.is_prize === is_prize);
+  // Finding the index of the second instance of the product in the cart (the product not with the same 'is_prize' variable value). Then 
+  const indexOfSecondProductInstance = cart.cartProducts.findIndex(cartproduct => cartproduct.product.id === newProduct.id && cartproduct.is_prize !== is_prize);
+  let amountOfSecondInstance = 0;
+  if (indexOfSecondProductInstance !== -1) {
+    amountOfSecondInstance = cart.cartProducts[indexOfSecondProductInstance].amount;
+  }
+  const availableStock = newProduct.stock - amountOfSecondInstance;
+
+  // Creating a variable to hold the updated total price and fetching the current price of the product + if happy hour has started
   let updatedTotalPrice = cart.totalPrice;
-  const getPrice = is_prize ? 0 : GetPrice(newProduct);
+  let [getPrice, is_happy_hour] = GetPriceAndHappyHour(newProduct);
+  getPrice = is_prize ? 0.00 : getPrice;
+
+  // Checking if the specific product exists in the cart
   if (index === -1) {
-    if (newProduct.stock < 1) { return; }
+    // Does nothing if the stock of the product is 0
+    if (availableStock < 1) { return; }
+    // Checks the amount is given as a number
     if (amount !== undefined && amount > 0) {
+      // Checks if the wanted amount is bigger than the product stock
+      if (availableStock < amount) {
+        amount = availableStock;
+      }
       updatedTotalPrice += getPrice * amount;
     } else {
+      // If the user wants to add 0 products, no changes will be made
+      if (amount === 0) { return; }
       amount = 1;
       updatedTotalPrice += getPrice;
     }
-    setCart({ cartProducts: [{product: newProduct, amount: amount, price: getPrice, is_prize: is_prize}, ...cart.cartProducts ], totalPrice: updatedTotalPrice})
+    // Adds one instance of the product with the defined amount, and updating the total price of the cart
+    setCart({ cartProducts: [{product: newProduct, amount: amount, price: getPrice, is_prize: is_prize, is_happy_hour_purchase: is_happy_hour}, ...cart.cartProducts ], totalPrice: updatedTotalPrice})
   } else {
+    // Fetching the information in the cart about the specific product
     newProduct = cart.cartProducts[index].product;
-    let updatedAmount = cart.cartProducts[index].amount;
+    const oldAmount = cart.cartProducts[index].amount;
     const oldPrice = cart.cartProducts[index].price;
     const is_prize = cart.cartProducts[index].is_prize;
+    let updatedAmount = oldAmount;
+
+    // Checks if amount is defined
     if (amount !== undefined) {
+      // If the user wants to add 0 products, no changes will be made
       if (amount === 0) { return; }
-      const oldAmount = updatedAmount;
+      // Adding the wanted amount to the cart
       updatedAmount += amount;
-      if (updatedAmount > newProduct.stock) {
-        updatedAmount = newProduct.stock;
+      // Checking if the wanted amount is bigger than the total stock of the product
+      if (updatedAmount > availableStock) {
+        updatedAmount = availableStock;
         updatedTotalPrice -= oldAmount * oldPrice;
         return;
-      } else if (updatedAmount < 1) {
+      } 
+      // Removing from the cart if the updatedAmount is less than 1 (if the given amount is negative)
+      else if (updatedAmount < 1) {
         RemoveFromCart(newProduct.id, cart, setCart, is_prize);
         return;
       }
+      // Recalculating the total price by subtracting the old product cost and adding the updated cost, because product prices can change during usage
       updatedTotalPrice -= oldAmount * oldPrice;
       updatedTotalPrice += getPrice * updatedAmount;
-    } else {
-      if (newProduct.stock > updatedAmount) {
-        updatedTotalPrice -= updatedAmount * oldPrice;
+    } 
+    // If the amount is not given, the amount is set to one
+    else {
+      // Checking if the later updated amount will be bigger than the product stock
+      if (availableStock > oldAmount) {
+        updatedTotalPrice -= oldAmount * oldPrice;
         updatedAmount += 1;
         updatedTotalPrice += getPrice * updatedAmount;
       }
     }
+    // Fetches the cartProduct list where the edited index is not included. The rest of the list is basically added to a list of only the edited product
     cart.cartProducts = cart.cartProducts.filter((_, idx) => idx !== index);
-    setCart({ cartProducts: [{product: newProduct, amount: updatedAmount, price: getPrice, is_prize: is_prize}, ...cart.cartProducts], totalPrice: updatedTotalPrice});
+    setCart({ cartProducts: [{product: newProduct, amount: updatedAmount, price: getPrice, is_prize: is_prize, is_happy_hour_purchase: is_happy_hour}, ...cart.cartProducts], totalPrice: updatedTotalPrice});
   }
 }
 

@@ -8,10 +8,9 @@ type ProductShowcaseProps = {
     cart: CartType;
     setCart: React.Dispatch<React.SetStateAction<CartType>>;
     setProducts: React.Dispatch<React.SetStateAction<Product[]>>;
-    onAddToCart?: (product: Product) => void; // Optional callback for adding a product to the cart
 }
 
-function ProductShowcase({ products, cart, setCart, setProducts, onAddToCart }: ProductShowcaseProps) {
+function ProductShowcase({ products, cart, setCart, setProducts }: ProductShowcaseProps) {
     return (
         <div className="product-showcase">
             <div className="product-showcase-header">
@@ -21,9 +20,12 @@ function ProductShowcase({ products, cart, setCart, setProducts, onAddToCart }: 
                 </div>
             </div>
             <div className="product-grid">
-                {products.map((product) => ( 
-                    Card(product, () => AddToCart(product, cart, setCart))
-                ))}
+                {products.map((product) => {
+                    if (product.stock > 0) {
+                        return Card(product, () => AddToCart(product, cart, setCart));
+                    }
+                    return null;
+                })}
             </div>
         </div>
     );

@@ -51,7 +51,7 @@ app.on('ready', () => {
         return confirmation;
     });
 
-    ipcMain.handle("get-sales", async (event, condition?: string, params?: any) => {
+    ipcMain.handle("get-sales", async (event, condition?: string, params?: Object) => {
         const sales = await GetSales(condition, params);
         return sales;
     });

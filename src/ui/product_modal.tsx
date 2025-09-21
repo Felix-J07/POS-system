@@ -76,6 +76,7 @@ export function ProductModal({ selectedProduct, setSelectedProduct, setModalVisi
             brand: form.get("brand") as string,
             name: form.get("name") as string,
             price: parseFloat(form.get("price") as string) || 0,
+            bought_price: selectedProduct.bought_price,
             stock: parseInt(form.get("stock") as string) || 0,
             image: form.get("image") as string,
             happy_hour_timestamps: happy_hour_timestamps,
@@ -113,6 +114,10 @@ export function ProductModal({ selectedProduct, setSelectedProduct, setModalVisi
             <label>
                 Pris:
                 <input type="number" min="0" step="0.01" defaultValue={selectedProduct.price} name="price" />
+            </label>
+            <label>
+                Pris for køb af vare:
+                <input disabled type="number" defaultValue={selectedProduct.price} name="bought_price" />
             </label>
             <label>
                 Lager:

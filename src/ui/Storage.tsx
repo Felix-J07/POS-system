@@ -15,7 +15,7 @@ function Storage({ products, setProducts }: StorageProps) {
     const [modalVisible, setModalVisible] = useState(false);
     const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
 
-    const emptyProduct = {id: -1, barcode: "", brand: "", name: "", price: 0, stock: 0, happy_hour_price: 0, happy_hour_timestamps: []};
+    const emptyProduct = {id: -1, barcode: "", brand: "", name: "", price: 0, bought_price: 0, stock: 0, happy_hour_price: 0, happy_hour_timestamps: []};
 
     return (
         <>

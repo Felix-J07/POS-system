@@ -9,7 +9,7 @@ import Storage from './Storage'
 import Statistics from './Statistics'
 import Settings from './Settings'
 import { GetProducts } from './database'
-import { GetPrice } from './helpers'
+import { GetPriceAndHappyHour } from './helpers'
 
 function App() {  
   const [products, setProducts] = useState<Product[]>([]) // Array of products from the database
@@ -25,7 +25,7 @@ function App() {
       const updatedCartProducts = prevCart.cartProducts.map(item => {
         const updatedProduct = products.find(p => p.id === item.product.id);
         return updatedProduct
-          ? { product: updatedProduct, amount: item.amount <= updatedProduct.stock ? item.amount : updatedProduct.stock, price: GetPrice(updatedProduct), is_prize: item.is_prize }
+          ? { product: updatedProduct, amount: item.amount <= updatedProduct.stock ? item.amount : updatedProduct.stock, price: GetPriceAndHappyHour(updatedProduct)[0], is_prize: item.is_prize, is_happy_hour_purchase: item.is_happy_hour_purchase }
           : item;
       });
       // Recalculate total price in case product prices changed

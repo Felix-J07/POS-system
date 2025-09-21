@@ -20,8 +20,8 @@ export function DeleteProduct(productId: number, setProducts: React.Dispatch<Rea
     window.electron.delete_product(productId).then(() => GetProducts({ setProducts }));
 }
 
-export async function GetSales(condition?: string, params?: any): Promise<SaleStatistics[]> {
-    return await window.electron.get_sales(condition, params);
+export async function GetSales(setSaleStatistics: React.Dispatch<React.SetStateAction<SaleStatistics[]>>, condition?: string, params?: Object) {
+    window.electron.get_sales(condition, params).then((sales: SaleStatistics[]) => setSaleStatistics(sales));
 }
 
 export function AddSale(sale: Sale) {
@@ -33,7 +33,5 @@ export function UpdateProductStock(sale: Sale, setProducts: React.Dispatch<React
 }
 
 export function ExportDatabase() {
-    // Logic to export the database
-    console.log("Exporting database...");
     window.electron.export_database();
 }
