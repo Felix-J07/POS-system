@@ -35,3 +35,13 @@ export function UpdateProductStock(sale: Sale, setProducts: React.Dispatch<React
 export function ExportDatabase() {
     window.electron.export_database();
 }
+
+export function ImportDatabase() {
+    // Add an alert where the user confirms or denies the import
+    const confirmed = window.confirm("Er du sikker på at du vil importere databasen? Databasen vil blive overskrevet.");
+    if (!confirmed) {
+        return;
+    }
+
+    window.electron.import_database();
+}

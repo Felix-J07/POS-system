@@ -69,5 +69,7 @@ interface Window {
         add_sale: (sale: Sale) => Promise<void>;
         update_product_stock: (sale: Sale) => Promise<boolean>;
         export_database: () => Promise<void>;
+        login(username: string, password: string): Promise<boolean>;
+        import_database: () => void;
     }
 }

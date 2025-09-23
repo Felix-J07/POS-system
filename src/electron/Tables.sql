@@ -34,19 +34,25 @@ CREATE TABLE IF NOT EXISTS sales (
     FOREIGN KEY (product_id) REFERENCES products(id)
 );
 
-CREATE TABLE IF NOT EXISTS settings (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    key TEXT NOT NULL UNIQUE,
-    value TEXT,
-    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
-);
-
 CREATE TABLE IF NOT EXISTS happy_hours (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     product_id INTEGER NOT NULL,
     start_time DATETIME NOT NULL,
     end_time DATETIME NOT NULL,
     FOREIGN KEY (product_id) REFERENCES products(id)
+);
+
+CREATE TABLE IF NOT EXISTS users (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    username TEXT NOT NULL UNIQUE,
+    password TEXT NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS settings (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    key TEXT NOT NULL UNIQUE,
+    value TEXT,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
 );
 
 INSERT INTO products (barcode, brand, name, price, bought_price, stock, happy_hour_price, image) VALUES
@@ -69,3 +75,5 @@ INSERT INTO sales (transaction_id, product_id, quantity, price_per_unit, total_p
 
 -- Happy hour + prize combo
 INSERT INTO sales (transaction_id, product_id, quantity, price_per_unit, total_price, is_prize, is_happy_hour_purchase, loss) VALUES (1005, 5, 1, 0.00, 0.00, 1, 1, 0);
+
+INSERT INTO users (username, password) VALUES ('test', 'test');

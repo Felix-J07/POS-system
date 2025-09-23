@@ -24,18 +24,22 @@ function Cart({ products, cart, setCart, setSale }: CartProps) {
     const barcode = event.currentTarget.value;
     const barcodeSplittedArray: string[] = barcode.split("*");
     let amount: number = 1;
+    let barcodeExtracted: string;
     if (barcode.includes("*")) {
       try {
         amount = parseInt(barcodeSplittedArray[0]);
+        barcodeExtracted = barcodeSplittedArray[1];
       } catch (error) {
         console.log(error);
       }
-      
+    }
+    else {
+      barcodeExtracted = barcode;
     }
 
-    const exists = products.some(product => String(product.barcode) === barcodeSplittedArray[1]);
+    const exists = products.some(product => String(product.barcode) === barcodeExtracted);
     if (event.key === 'Enter' && exists) {
-      const product = products.filter((product) => product.barcode === barcodeSplittedArray[1]);
+      const product = products.filter((product) => product.barcode === barcodeExtracted);
       AddToCart(product[0], cart, setCart, amount);
       event.currentTarget.value = "";
     }
@@ -45,7 +49,8 @@ function Cart({ products, cart, setCart, setSale }: CartProps) {
 
   const addPrizeModal = () => {
     setModalVisible(true);
-    PrizeModal({ products, cart, setCart });
+    console.log(products.filter(item => item.stock > 0));
+    PrizeModal({ products: products.filter(item => item.stock > 0), cart, setCart });
   };
 
   return (
@@ -98,7 +103,7 @@ function productDiv(product: Product, amount: number, cart: CartType, setCart: R
 
   return (
     <div className="cart-product" key={`${product.id}-${is_prize ? 'prize' : 'regular'}`} id={`cart-product-${product.id}`}>
-      <img src={product.image} alt={product.name} className="cart-product-image" />
+      <img src={product.image || "alt_img.png"} alt={product.name} className="cart-product-image" />
       <div className="cart-product-info">
         <div className="cart-product-row cart-product-row-top">
           <div className="cart-product-name">

@@ -8,10 +8,14 @@ import Checkout from './Checkout'
 import Storage from './Storage'
 import Statistics from './Statistics'
 import Settings from './Settings'
+import Login from './Login'
 import { GetProducts } from './database'
 import { GetPriceAndHappyHour } from './helpers'
 
-function App() {  
+function App() {
+  // Set to false on startup
+  const [logged_in, setLogged_in] = useState<boolean>(false);
+
   const [products, setProducts] = useState<Product[]>([]) // Array of products from the database
   // Set product on product cards when app starts up
   useEffect(() => {
@@ -52,12 +56,21 @@ function App() {
     <HashRouter>
       <Navbar />
       <div className="main-container">
+        {logged_in && <div className="logout-button">
+          <button id="logout" onClick={() => setLogged_in(false)}>Logud</button>
+        </div>}
         <Routes>
-          <Route path="/" element={<Index products={products} cart={cart} setCart={setCart} setProducts={setProducts} setSale={setSale} />} />
-          <Route path="/checkout" element={<Checkout setCart={setCart} sale={sale} setSales={setSale} setProducts={setProducts} />} />
-          <Route path="/storage" element={<Storage products={products} setProducts={setProducts} />} />
-          <Route path="/statistics" element={<Statistics />} />
-          <Route path="/settings" element={<Settings />} />
+          {logged_in ? (
+            <>
+              <Route path="/" element={<Index products={products} cart={cart} setCart={setCart} setProducts={setProducts} setSale={setSale} />} />
+              <Route path="/checkout" element={<Checkout setCart={setCart} sale={sale} setSales={setSale} setProducts={setProducts} />} />
+              <Route path="/storage" element={<Storage products={products} setProducts={setProducts} />} />
+              <Route path="/statistics" element={<Statistics products={products} />} />
+              <Route path="/settings" element={<Settings />} />
+            </>
+          ) : (
+            <Route path="*" element={<Login setLogged_in={setLogged_in} />} />
+          )}
         </Routes>
       </div>
     </HashRouter>

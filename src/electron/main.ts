@@ -2,7 +2,7 @@ import { app, BrowserWindow, ipcMain } from "electron"
 import * as path from "path";
 import { isDev } from "./util.js";
 //import log from "electron-log";
-import { GetProducts, AddProduct, UpdateProduct, DeleteProduct, GetSales, AddSale, UpdateProductStock, ExportDatabase } from "./database.js";
+import { GetProducts, AddProduct, UpdateProduct, DeleteProduct, GetSales, AddSale, UpdateProductStock, ExportDatabase, Login, ImportDatabase } from "./database.js";
 
 // Change log levels
 //log.transports.console.level = "silly"; // everything goes to terminal
@@ -70,6 +70,16 @@ app.on('ready', () => {
         const confirmation = await ExportDatabase(mainWindow);
         return confirmation;
     });
+
+    ipcMain.handle("login", async (event, {username, password}) => {
+        const confirmation = await Login(username, password);
+        return confirmation;
+    });
+
+    ipcMain.handle("import-database", (event) => {
+        ImportDatabase();
+        return;
+    })
 });
 
 app.on("window-all-closed", () => {

@@ -303,6 +303,24 @@ export async function UpdateProductStock(sale: Sale): Promise<boolean> {
   });
 }
 
+export function Login(username: string, password: string): Promise<boolean> {
+  return new Promise((resolve, reject) => {
+    //log.info(`${username} is trying to login with password: ${password}`);
+    db.get<{id: number}|undefined>("SELECT * FROM users WHERE username = $username AND password = $password", { $username: username, $password: password }, (error, row) => {
+      if (error) {
+        //log.info("Error during login:", error);
+        reject(error);
+        return;
+      }
+      if (row) {
+        resolve(true);
+      } else {
+        resolve(false);
+      }
+    });
+  });
+}
+
 export async function ExportDatabase(window: Electron.BrowserWindow): Promise<void> {
   try {
     const result = await dialog.showSaveDialog(window, {
@@ -343,6 +361,11 @@ export async function ExportDatabase(window: Electron.BrowserWindow): Promise<vo
     dialog.showErrorBox("Exportering af database", "Fejl");
     return;
   }
+}
+
+export function ImportDatabase() {
+  fs.copyFileSync(path.join(process.resourcesPath, "public", "database.db"), dbPath);
+  return;
 }
 
 export default db;

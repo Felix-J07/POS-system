@@ -25,5 +25,16 @@ electron.contextBridge.exposeInMainWorld('electron', {
     },
     export_database: async () => {
         return await electron.ipcRenderer.invoke("export-database");
+    },
+    login: async (username: string, password: string) => {
+        var args = {
+            username: username,
+            password: password
+        };
+        return await electron.ipcRenderer.invoke("login", args);
+    },
+    import_database: () => {
+        electron.ipcRenderer.invoke("import-database");
+        return;
     }
 } satisfies Window['electron']);

@@ -1,71 +1,3 @@
-/*.product-modal {
-    all: unset;
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100vw;
-    height: 100vh;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 1000;
-    visibility: visible;
-    opacity: 1;
-    transition: opacity 0.3s ease;
-    background: "rgba(0,0,0,0.5)";
-    backdrop-filter: blur(4px);
-}
-
-.product-modal-content {
-    all: unset;
-    background: #fff;
-    padding: 20px;
-    margin: "10vh auto";
-    border-radius: 12px;
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
-    border-radius: 8px;
-    max-width: 800px;
-    max-height: 90vh;
-    animation: fadeInScale 0.3s ease;
-    overflow-y: auto;
-    overflow-x: hidden;
-}
-
-@keyframes fadeInScale {
-    from {
-        opacity: 0;
-        transform: scale(0.95);
-    }
-    to {
-        opacity: 1;
-        transform: scale(1);
-    }
-}
-
-.product-modal-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-bottom: 24px;
-}
-
-.product-modal-header h2 {
-    font-size: 20px;
-    font-weight: 600;
-    margin: 0;
-}
-
-.product-modal-header span {
-    font-size: 20px;
-    color: #666;
-    cursor: pointer;
-    transition: color 0.2s ease;
-}
-
-.product-modal-header span:hover {
-    color: #000;
-}*/
-
 .product-form label {
     display: block;
     margin-bottom: 16px;
@@ -90,6 +22,10 @@
     border-color: #007bff;
     box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.2);
     outline: none;
+}
+
+.product-form input:disabled {
+    background-color: #dedede;
 }
 
 .product-form-buttons {

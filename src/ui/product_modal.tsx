@@ -101,27 +101,27 @@ export function ProductModal({ selectedProduct, setSelectedProduct, setModalVisi
         <form className="product-form" onSubmit={HandleFormSubmit} onKeyDown={e => e.key === 'Enter' && e.preventDefault()}>
             <label>
                 Navn:
-                <input type="text" defaultValue={selectedProduct.name} name="name" />
+                <input type="text" defaultValue={selectedProduct.name} name="name" required />
             </label>
             <label>
                 Mærke:
-                <input type="text" defaultValue={selectedProduct.brand} name="brand" />
+                <input type="text" defaultValue={selectedProduct.brand} name="brand" required />
             </label>
             <label>
                 Stregkode:
-                <input type="text" defaultValue={selectedProduct.barcode} name="barcode" />
+                <input type="text" defaultValue={selectedProduct.barcode} name="barcode" required />
             </label>
             <label>
                 Pris:
-                <input type="number" min="0" step="0.01" defaultValue={selectedProduct.price} name="price" />
+                <input type="number" min="0" step="0.01" defaultValue={selectedProduct.price} name="price" required />
             </label>
             <label>
                 Pris for køb af vare:
-                <input disabled type="number" defaultValue={selectedProduct.price} name="bought_price" />
+                <input type="number" defaultValue={selectedProduct.bought_price} name="bought_price" />
             </label>
             <label>
                 Lager:
-                <input type="number" min="0" step="1" defaultValue={selectedProduct.stock} name="stock" />
+                <input type="number" min="0" step="1" defaultValue={selectedProduct.stock} name="stock" required />
             </label>
             <label>
                 Billede URL:
@@ -133,7 +133,7 @@ export function ProductModal({ selectedProduct, setSelectedProduct, setModalVisi
                     Happy hour pris:
                     <input type="number" min="0" step="0.01" defaultValue={selectedProduct.happy_hour_price} name="happy_hour_price" />
                 </label>
-                <h4>Happy Hour Timestamps</h4>
+                <h4>Happy Hour Tidsstempler</h4>
                 {selectedProduct.happy_hour_timestamps.map((ts, index) => (
                     <div key={index} className="timestamp-row">
                         <input name="timestamp_index" type="hidden" value={index} />
@@ -153,7 +153,7 @@ export function ProductModal({ selectedProduct, setSelectedProduct, setModalVisi
                     <Trash className="remove-timestamp" onClick={() => removeTimestamp(index)} />
                     </div>
                 ))}
-                <button type="button" className="add-timestamp" onClick={addTimestamp}><Plus /> Add Timestamp</button>
+                <button type="button" className="add-timestamp" onClick={addTimestamp}><Plus /> Tilføj Happy Hour Tidsstempel</button>
             </div>
 
             <div className="product-form-buttons">

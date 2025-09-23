@@ -1,0 +1,81 @@
+.statistics-page {
+  padding: 32px 20px;
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: #f7f8fa;
+  min-height: 90vh;
+  overflow-y: auto;
+}
+
+.statistics-cards {
+  display: flex;
+  gap: 32px;
+  margin-bottom: 32px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.sale-card, .profit-card, .stock-value-card {
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  padding: 28px 36px;
+  min-width: 220px;
+  max-width: 320px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  cursor: pointer;
+  transition: box-shadow 0.2s, transform 0.2s;
+}
+
+.sale-card:hover, .profit-card:hover, .stock-value-card:hover {
+  box-shadow: 0 6px 18px rgba(0,0,0,0.16);
+  transform: translateY(-2px) scale(1.03);
+}
+
+.sale-card h3, .profit-card h3, .stock-value-card h3 {
+  margin: 0 0 8px 0;
+  font-size: 1.3rem;
+  color: #2d3748;
+}
+
+.sale-card label, .profit-card label, .stock-value-card label {
+  font-size: 1.1rem;
+  color: #444;
+  margin-bottom: 4px;
+  display: block;
+}
+
+.stock-value-card h6 {
+  margin: 0 0 8px 0;
+  font-size: 0.9rem;
+  color: #888;
+  font-weight: normal;
+}
+
+.graph-area {
+  width: 100%;
+  max-width: 900px;
+  min-height: 300px;
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  padding: 32px 24px;
+  margin-top: 12px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.graph {
+  width: 100%;
+  min-height: 220px;
+  display: block;
+}
+
+.graph[hidden] {
+  display: none;
+}
