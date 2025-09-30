@@ -117,7 +117,7 @@ export function ProductModal({ selectedProduct, setSelectedProduct, setModalVisi
             </label>
             <label>
                 Pris for køb af vare:
-                <input type="number" defaultValue={selectedProduct.bought_price} name="bought_price" />
+                <input type="number" min="0" step="0.01" defaultValue={selectedProduct.bought_price} name="bought_price" />
             </label>
             <label>
                 Lager:

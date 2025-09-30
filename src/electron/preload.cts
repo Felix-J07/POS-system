@@ -1,5 +1,6 @@
 const electron = require('electron');
 
+// Make APIs available in the renderer process
 electron.contextBridge.exposeInMainWorld('electron', {
     get_products: async () => {
         const products: Product[] = await electron.ipcRenderer.invoke('get-products');

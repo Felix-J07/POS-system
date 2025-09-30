@@ -1,7 +1,7 @@
 import { app, BrowserWindow, ipcMain } from "electron"
 import * as path from "path";
 import { isDev } from "./util.js";
-//import log from "electron-log";
+//import log from "electron-log"; // For debugging purposes
 import { GetProducts, AddProduct, UpdateProduct, DeleteProduct, GetSales, AddSale, UpdateProductStock, ExportDatabase, Login, ImportDatabase } from "./database.js";
 
 // Change log levels
@@ -9,7 +9,10 @@ import { GetProducts, AddProduct, UpdateProduct, DeleteProduct, GetSales, AddSal
 //log.transports.file.level = "info";     // only info+ goes to file
 //Object.assign(console, log.functions);
 
+// When the app is ready (turned on), create the browser window.
 app.on('ready', () => {
+    // Create the browser window with the following options
+    // Preload script is used to expose certain APIs to the renderer process
     let mainWindow = new BrowserWindow({
         // preload script
         webPreferences: {
@@ -20,6 +23,8 @@ app.on('ready', () => {
         width: 1200,
         height: 600
     });
+    // If the app is in development mode, load the React app from the local server and open DevTools.
+    // Otherwise, load the built React app from the filesystem, hide the menu bar, set the title, maximize the window, and open DevTools.
     if (isDev()) {
         mainWindow.loadURL("http://localhost:5123");
         mainWindow.webContents.openDevTools();
@@ -31,6 +36,7 @@ app.on('ready', () => {
         mainWindow.webContents.openDevTools();
     }
 
+    // IPC handlers for communication between the main and renderer processes
     ipcMain.handle("get-products", async (event) => {
         const products = await GetProducts();
         return products;
@@ -82,6 +88,8 @@ app.on('ready', () => {
     })
 });
 
+// Quit the app when all windows are closed
+// Except on macOS where it's common for apps to stay open until the user explicitly quits.
 app.on("window-all-closed", () => {
     if (process.platform !== "darwin") {
         app.quit();
