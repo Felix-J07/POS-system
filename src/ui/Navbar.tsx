@@ -2,6 +2,9 @@ import { Link } from 'react-router-dom';
 import './static/Navbar.css';
 import { House, PackageOpen, ChartLine, Settings } from 'lucide-react';
 
+// React functional component for the navigation bar
+// Contains React links to different pages in the app
+// HTML code gotten from codepen along with the css code
 function Navbar() {
     return (
         <nav className="navbar">

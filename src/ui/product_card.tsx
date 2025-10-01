@@ -1,7 +1,10 @@
 import './static/product_card.css';
 import { GetPriceAndHappyHour } from './helpers'
 
+// React functional component for a product card
+// Function is reusable in different scenarios
 export function Card(product: Product, onClick?: () => void): React.JSX.Element {
+    // All needed info about the products are shown in the card component
     return (
         <div className="product-card" key={product.id} onClick={onClick}>
             <span className="product-id" hidden>{product.id}</span>

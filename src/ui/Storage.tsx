@@ -6,11 +6,16 @@ import { useState } from "react";
 import { Modal } from "./modal";
 import { ProductModal } from "./product_modal";
 
+// Props for the Storage component (type checking)
 type StorageProps = {
     products: Product[],
     setProducts: React.Dispatch<React.SetStateAction<Product[]>>
 }
 
+// Show and manage product storage
+// Add, edit, delete products
+// Update product list from database
+// Future: Add functionality to import/export product list as CSV. Add functionality to add lost products (products that are wasn't sold but were thrown away or given to LAN members)
 function Storage({ products, setProducts }: StorageProps) {
     const [modalVisible, setModalVisible] = useState(false);
     const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);

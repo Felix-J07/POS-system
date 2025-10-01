@@ -8,6 +8,7 @@ import { Modal } from './modal';
 import { Card } from './product_card';
 import './static/ProductShowcase.css';
 
+// Props for the Cart component (for TypeScript type checking)
 type CartProps = {
   products: Product[];
   cart: CartType;
@@ -15,16 +16,23 @@ type CartProps = {
   setSale: React.Dispatch<React.SetStateAction<Sale | null>>;
 };
 
+// React functional component for the cart
 function Cart({ products, cart, setCart, setSale }: CartProps) {
+  // State for controlling the visibility of the prize modal
   const [modalVisible, setModalVisible] = useState(false);
   
+  // Destructure cart to get cartProducts and totalPrice
   const { cartProducts, totalPrice } = cart;
 
+  // Function to handle barcode input from the input field
   const barcodeInput = (event: React.KeyboardEvent<HTMLInputElement>) => {
     const barcode = event.currentTarget.value;
+    // Split the barcode if it contains '*', which indicates a quantity prefix
     const barcodeSplittedArray: string[] = barcode.split("*");
     let amount: number = 1;
     let barcodeExtracted: string;
+    // If the barcode contains '*', try to parse the amount and extract the actual barcode
+    // Else just use the barcode as is
     if (barcode.includes("*")) {
       try {
         amount = parseInt(barcodeSplittedArray[0]);
@@ -37,6 +45,7 @@ function Cart({ products, cart, setCart, setSale }: CartProps) {
       barcodeExtracted = barcode;
     }
 
+    // Check if the product with the scanned barcode exists in the products list
     const exists = products.some(product => String(product.barcode) === barcodeExtracted);
     if (event.key === 'Enter' && exists) {
       const product = products.filter((product) => product.barcode === barcodeExtracted);
@@ -44,15 +53,21 @@ function Cart({ products, cart, setCart, setSale }: CartProps) {
       event.currentTarget.value = "";
     }
 
+    // Change the border color of the input field to green if the product exists, else red
     event.currentTarget.style.borderColor = exists ? 'green' : 'red';
   };
 
+  // Function to open the prize modal. The modal allows the user to select a product to add as a prize. A prize is a free product from fx a tournament.
   const addPrizeModal = () => {
+    // Sets the modal visibility state to true
     setModalVisible(true);
-    console.log(products.filter(item => item.stock > 0));
+    // Renders the PrizeModal component inside the Modal component
     PrizeModal({ products: products.filter(item => item.stock > 0), cart, setCart });
   };
 
+  // Render the cart component
+  // Includes an input field for barcode scanning, a list of products in the cart, and buttons for clearing the cart and proceeding to checkout
+  // Each product in the cart is rendered using the productDiv function
   return (
     <>
       <div className="cart">
@@ -79,7 +94,10 @@ function Cart({ products, cart, setCart, setSale }: CartProps) {
   );
 }
 
+// Function to render each product in the cart
 function productDiv(product: Product, amount: number, cart: CartType, setCart: React.Dispatch<React.SetStateAction<CartType>>, is_prize: boolean = false): React.JSX.Element {
+  // Action for reducing the amount of a product by one when pressing the '-' button
+  // If the amount is 1, the product is removed from the cart
   const reduceAmount = () => {
     if (amount <= 1) {
       RemoveFromCart(product.id, cart, setCart, is_prize);
@@ -92,15 +110,22 @@ function productDiv(product: Product, amount: number, cart: CartType, setCart: R
       }
     });
   };
+  // Action for increasing the amount of a product by one when pressing the '+' button
+  // If the amount is equal to the stock, nothing happens
   const increaseAmount = () => {
     AddToCart(product, cart, setCart, 1, is_prize);
   };
+  // Action for removing the product from the cart when pressing the trash icon button
   const removeItem = () => {
     if (product.id !== null) {
       RemoveFromCart(product.id, cart, setCart, is_prize);
     }
   };
 
+  // Render the product in the cart with its image, name, brand, amount, and price
+  // Includes buttons for increasing/decreasing the amount and removing the product from the cart
+  // If the product is a prize, its price is shown as 0.00
+  // The product is identified uniquely in the cart by its ID and whether it is a prize or not
   return (
     <div className="cart-product" key={`${product.id}-${is_prize ? 'prize' : 'regular'}`} id={`cart-product-${product.id}`}>
       <img src={product.image || "alt_img.png"} alt={product.name} className="cart-product-image" />
@@ -127,10 +152,13 @@ function productDiv(product: Product, amount: number, cart: CartType, setCart: R
   );
 }
 
+// Function to convert the current cart into a Sale object for processing during checkout
+// If the cart is empty, it returns null
 function SaleConvert(cart: CartType): Sale | null {
   if (cart.cartProducts.length < 1) return null;
+  // Create a Sale object with the cart details
   let sale: Sale = {
-    datetime: new Date().toISOString(),
+    datetime: new Date().toISOString(), // Sale object accepts strings, not Date objects. Sqlite stores dates as strings
     total_sale_price: parseFloat(cart.cartProducts.reduce((sum, item) => sum + (item.is_prize ? 0.00 : item.price * item.amount), 0).toFixed(2)),
     soldProducts: cart.cartProducts.map(({ product, amount, price, is_prize, is_happy_hour_purchase }) => ({
       product: product,
@@ -143,6 +171,7 @@ function SaleConvert(cart: CartType): Sale | null {
   return sale;
 }
 
+// Function to remove a product from the cart based on its ID and whether it is a prize or not
 function RemoveFromCart(productId: number, cart: CartType, setCart: React.Dispatch<React.SetStateAction<CartType>>, is_prize: boolean) {
   const { cartProducts } = cart; // Fetch current products in cart
   const updatedProducts = cartProducts.filter(item => item.product.id !== productId || item.is_prize !== is_prize); // Remove the product with the given ID
@@ -235,12 +264,15 @@ export function AddToCart(product: Product, cart: CartType, setCart: React.Dispa
   }
 }
 
-//function productDiv(product: Product, amount: number, cart: CartType, setCart: React.Dispatch<React.SetStateAction<CartType>>)
+// Component for the prize modal
 function PrizeModal({ products, cart, setCart }: { products: Product[], cart: CartType, setCart: React.Dispatch<React.SetStateAction<CartType>> }): React.JSX.Element {
+  // Action for adding a product as a prize to the cart when clicking on the product card in the modal
   const AddPrizeToCart = (product: Product) => {
     AddToCart(product, cart, setCart, 1, true);
   };
 
+  // Render the prize modal with a grid of products that can be added as prizes
+  // Each product is rendered using the Card component and clicking on a product adds it to the cart as a prize
   return (
     <div>
       <h2>Tilføj præmie</h2>

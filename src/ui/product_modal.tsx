@@ -3,7 +3,7 @@ import { AddProduct, UpdateProduct, DeleteProduct } from './database';
 import './static/product_modal.css';
 import type { JSX } from 'react';
 
-
+// Props for ProductModal for type checking
 type ProductModalProps = {
     selectedProduct: Product,
     setSelectedProduct: React.Dispatch<React.SetStateAction<Product | null>>,
@@ -11,8 +11,9 @@ type ProductModalProps = {
     setProducts: React.Dispatch<React.SetStateAction<Product[]>>
 }
 
+// Content in the Modal function for when the user adds a new product or edits an existing product
 export function ProductModal({ selectedProduct, setSelectedProduct, setModalVisible, setProducts }: ProductModalProps): JSX.Element {
-    // Helper to update a timestamp in selectedProduct
+    // Update the timestamp list when user changes a timestamp
     function updateTimestamp(index: number, field: 'startTime' | 'endTime', value: string) {
         if (!selectedProduct) return;
         const updatedTimestamps = selectedProduct.happy_hour_timestamps.map((ts, i) =>
@@ -21,17 +22,23 @@ export function ProductModal({ selectedProduct, setSelectedProduct, setModalVisi
         setSelectedProduct({ ...selectedProduct, happy_hour_timestamps: updatedTimestamps });
     }
 
-    // Dummy implementations for removeTimestamp and addTimestamp to avoid errors
+    // Removing a timestamp from the list when the trash icon is pressed
     function removeTimestamp(index: number) {
         if (!selectedProduct) return;
         const updatedTimestamps = selectedProduct.happy_hour_timestamps.filter((_, i) => i !== index);
         setSelectedProduct({ ...selectedProduct, happy_hour_timestamps: updatedTimestamps });
     }
 
+    // Adding a new timestamp to the list when the add button is pressed
     function addTimestamp() {
+        if (!selectedProduct) return;
+        // Add a new timestamp with current time as start and end time
         const newTimestamp = { startTime: new Date(), endTime: new Date() };
+        // Update the selected product with the new timestamp
         setSelectedProduct(prev => {
+            // If no previous state, return early
             if (!prev) return prev;
+            // Update the product with the new timestamp
             return {
                 ...prev,
                 happy_hour_timestamps: [
@@ -42,11 +49,19 @@ export function ProductModal({ selectedProduct, setSelectedProduct, setModalVisi
         });
     }
 
+    // Handle form submission when user saves the product
     function HandleFormSubmit(event: React.FormEvent<HTMLFormElement>) {
+        // Prevent the page from reloading
         event.preventDefault();
 
+        // Saves the submitted form as a FormData object
         const form = new FormData(event.target as HTMLFormElement);
 
+        // Get all happy hour timestamps from the form
+        // Each timestamp has a start and end time input field
+        // The index of each timestamp is stored in a hidden input field
+        // This allows for dynamic number of timestamps
+        // Validate timestamps before saving
         let happy_hour_timestamps: { startTime: Date, endTime: Date }[] = [];
         form.getAll("timestamp_index").forEach((indexStr) => {
             const index = Number(indexStr);
@@ -70,6 +85,7 @@ export function ProductModal({ selectedProduct, setSelectedProduct, setModalVisi
             }
         });
 
+        // Create updated product object from the form data
         const updatedProduct: Product = {
             id: selectedProduct.id,
             barcode: form.get("barcode") as string,
@@ -83,20 +99,26 @@ export function ProductModal({ selectedProduct, setSelectedProduct, setModalVisi
             happy_hour_price: parseFloat(form.get("happy_hour_price") as string) || 0,
         }
 
-        // Update the database and refresh product list
+        // If the id of the selected product is a number that is not -1, the product will be updated in the database
+        // Otherwise add the product to the database as a new product
         if (selectedProduct.id && selectedProduct.id !== -1) {
             UpdateProduct(updatedProduct, setProducts);
         } else {
             AddProduct(updatedProduct, setProducts);
         }
+        // Closes the modal
         setModalVisible(false);
     }
 
+    // Delete the selected product from the database and close the modal
     const deleteProduct = (productId: number) => {
         DeleteProduct(productId, setProducts);
         setModalVisible(false);
     }
     
+    // A form with input fields to add all the needed information about a product
+    // Some of the input fields are "required" fields while others are not
+    // There are cancel, delete and save buttons in the bottom of the form
     return (
         <form className="product-form" onSubmit={HandleFormSubmit} onKeyDown={e => e.key === 'Enter' && e.preventDefault()}>
             <label>
@@ -160,15 +182,16 @@ export function ProductModal({ selectedProduct, setSelectedProduct, setModalVisi
                 {selectedProduct.id && selectedProduct.id !== -1 && (
                     <button type="button" className="delete-button" onClick={() => deleteProduct(selectedProduct.id)}>Slet</button>
                 )}
-                    <button type="submit" className="save-button">Gem</button>
+                <button type="submit" className="save-button">Gem</button>
                 <button type="button" className="cancel-button" onClick={() => setModalVisible(false)}>Annuller</button>
             </div>
         </form>
     );
 }
 
+// Takes already existing dates from the selected product and converts them to a format to output to the datetime-local input field
+// Converts to the format 'YYYY-MM-DDTHH:mm'
 function formatDate(date: string | number | Date ): string {
-    // Converts a date to 'YYYY-MM-DDTHH:mm' format for datetime-local input
     const d = new Date(date);
     const pad = (n: number) => n.toString().padStart(2, '0');
     return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;

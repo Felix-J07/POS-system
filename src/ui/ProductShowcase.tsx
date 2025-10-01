@@ -3,6 +3,7 @@ import './static/ProductShowcase.css';
 import { GetProducts } from './database';
 import { Card } from './product_card';
 
+// Props for the ProductShowcase for type checking
 type ProductShowcaseProps = {
     products: Product[];
     cart: CartType;
@@ -10,6 +11,8 @@ type ProductShowcaseProps = {
     setProducts: React.Dispatch<React.SetStateAction<Product[]>>;
 }
 
+// ProductShowcase component to display products and handle adding them to the cart
+// Uses the Card component to display each product
 function ProductShowcase({ products, cart, setCart, setProducts }: ProductShowcaseProps) {
     return (
         <div className="product-showcase">

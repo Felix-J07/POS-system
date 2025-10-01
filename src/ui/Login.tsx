@@ -1,11 +1,16 @@
 import './static/Login.css'
 import React from 'react'
 
+// Define the props for the Login component for type checking
 type LoginProps = {
     setLogged_in: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
+// Login component to handle user authentication
+// It accepts a prop 'setLogged_in' to update the login state in the parent component
+// The component renders a simple login form and handles form submission
 function Login({setLogged_in}: LoginProps): React.JSX.Element {
+    // When the form is submitted, prevent the default behavior, extract username and password, and call the API
     function HandleFormSubmit(e: React.FormEvent<HTMLFormElement>) {
         e.preventDefault();
 
@@ -14,7 +19,11 @@ function Login({setLogged_in}: LoginProps): React.JSX.Element {
         const username = form.get('username') as string;
         const password = form.get('password') as string;
 
+        // Validate the username and password
         if (username && password) {
+            // Call the login API and handle the response
+            // If anything is returned, set the logged_in state to true
+            // Otherwise, alert the user about invalid credentials
             window.electron.login(username, password).then((res) => {
                 if (res) {
                     setLogged_in(true);
@@ -25,6 +34,7 @@ function Login({setLogged_in}: LoginProps): React.JSX.Element {
         }
     }
 
+    // Render the login form
     return (
         <div className="login-container">
             <h3>Login</h3>
