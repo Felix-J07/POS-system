@@ -4,7 +4,7 @@ import { House, PackageOpen, ChartLine, Settings } from 'lucide-react';
 
 // React functional component for the navigation bar
 // Contains React links to different pages in the app
-// HTML code gotten from codepen along with the css code
+// HTML code gotten from codepen along with the css code (https://codepen.io/onediv/pen/WNOdMWw)
 function Navbar() {
     return (
         <nav className="navbar">
