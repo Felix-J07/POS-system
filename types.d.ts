@@ -53,6 +53,12 @@ type SaleStatistics = {
     } // Product sold in this sale
 }
 
+// Inserted lan dates to show in statistics
+type LanDatesType = {
+    startDate: Date,
+    endDate: Date
+}
+
 // Extend the Window interface to include the electron API
 // The API in the app to be able to use TypeScript type checking
 interface Window {
@@ -65,7 +71,10 @@ interface Window {
         add_sale: (sale: Sale) => Promise<void>;
         update_product_stock: (sale: Sale) => Promise<boolean>;
         export_database: () => Promise<void>;
-        login(username: string, password: string): Promise<boolean>;
-        import_database: () => void;
+        login: (username: string, password: string) => Promise<boolean>;
+        import_database: () => Promise<void>;
+        reset_database: () => void;
+        get_lan_dates: () => Promise<LanDatesType[]>;
+        update_lan_dates: (lanDates: LanDatesType[]) => Promise<void>;
     }
 }

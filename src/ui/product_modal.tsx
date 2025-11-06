@@ -1,7 +1,9 @@
 import { Trash, Plus } from 'lucide-react';
-import { AddProduct, UpdateProduct, DeleteProduct } from './database';
+import { AddProduct, UpdateProduct, DeleteProduct, GetProducts } from './database';
 import './static/product_modal.css';
 import type { JSX } from 'react';
+import { formatDate } from './helpers';
+import { useState } from 'react';
 
 // Props for ProductModal for type checking
 type ProductModalProps = {
@@ -13,20 +15,22 @@ type ProductModalProps = {
 
 // Content in the Modal function for when the user adds a new product or edits an existing product
 export function ProductModal({ selectedProduct, setSelectedProduct, setModalVisible, setProducts }: ProductModalProps): JSX.Element {
+    // Set a temporary state for the happy hour timestamps of the selected product to not directly modify the selected product state
+    const [tempHappyHourTimestamps, setTempHappyHourTimestamps] = useState(selectedProduct.happy_hour_timestamps);
+
     // Update the timestamp list when user changes a timestamp
     function updateTimestamp(index: number, field: 'startTime' | 'endTime', value: string) {
         if (!selectedProduct) return;
-        const updatedTimestamps = selectedProduct.happy_hour_timestamps.map((ts, i) =>
+        const updatedTimestamps = tempHappyHourTimestamps.map((ts, i) =>
             i === index ? { ...ts, [field]: new Date(value) } : ts
         );
-        setSelectedProduct({ ...selectedProduct, happy_hour_timestamps: updatedTimestamps });
+        setTempHappyHourTimestamps(updatedTimestamps);
     }
 
     // Removing a timestamp from the list when the trash icon is pressed
     function removeTimestamp(index: number) {
-        if (!selectedProduct) return;
-        const updatedTimestamps = selectedProduct.happy_hour_timestamps.filter((_, i) => i !== index);
-        setSelectedProduct({ ...selectedProduct, happy_hour_timestamps: updatedTimestamps });
+        const updatedTimestamps = tempHappyHourTimestamps.filter((_, i) => i !== index);
+        setTempHappyHourTimestamps(updatedTimestamps);
     }
 
     // Adding a new timestamp to the list when the add button is pressed
@@ -35,17 +39,11 @@ export function ProductModal({ selectedProduct, setSelectedProduct, setModalVisi
         // Add a new timestamp with current time as start and end time
         const newTimestamp = { startTime: new Date(), endTime: new Date() };
         // Update the selected product with the new timestamp
-        setSelectedProduct(prev => {
+        setTempHappyHourTimestamps(prev => {
             // If no previous state, return early
             if (!prev) return prev;
             // Update the product with the new timestamp
-            return {
-                ...prev,
-                happy_hour_timestamps: [
-                    ...prev.happy_hour_timestamps,
-                    newTimestamp
-                ]
-            };
+            return [...prev, newTimestamp];
         });
     }
 
@@ -156,19 +154,19 @@ export function ProductModal({ selectedProduct, setSelectedProduct, setModalVisi
                     <input type="number" min="0" step="0.01" defaultValue={selectedProduct.happy_hour_price} name="happy_hour_price" />
                 </label>
                 <h4>Happy Hour Tidsstempler</h4>
-                {selectedProduct.happy_hour_timestamps.map((ts, index) => (
+                {tempHappyHourTimestamps.map((ts, index) => (
                     <div key={index} className="timestamp-row">
                         <input name="timestamp_index" type="hidden" value={index} />
                         <input
                             type="datetime-local"
-                            value={formatDate(ts.startTime)}
+                            value={formatDate(ts.startTime, 'datetime')}
                             onChange={(e) => updateTimestamp(index, 'startTime', e.target.value)}
                             name={`startTime_${index}`}
                         />
                     <span>→</span>
                     <input
                         type="datetime-local"
-                        value={formatDate(ts.endTime)}
+                        value={formatDate(ts.endTime, 'datetime')}
                         onChange={(e) => updateTimestamp(index, 'endTime', e.target.value)}
                         name={`endTime_${index}`}
                     />
@@ -187,12 +185,4 @@ export function ProductModal({ selectedProduct, setSelectedProduct, setModalVisi
             </div>
         </form>
     );
-}
-
-// Takes already existing dates from the selected product and converts them to a format to output to the datetime-local input field
-// Converts to the format 'YYYY-MM-DDTHH:mm'
-function formatDate(date: string | number | Date ): string {
-    const d = new Date(date);
-    const pad = (n: number) => n.toString().padStart(2, '0');
-    return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
 }

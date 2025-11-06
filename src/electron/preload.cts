@@ -34,8 +34,19 @@ electron.contextBridge.exposeInMainWorld('electron', {
         };
         return await electron.ipcRenderer.invoke("login", args);
     },
-    import_database: () => {
-        electron.ipcRenderer.invoke("import-database");
+    import_database: async () => {
+        await electron.ipcRenderer.invoke("import-database");
         return;
+    },
+    reset_database: () => {
+        electron.ipcRenderer.invoke("reset-database");
+        return;
+    },
+    get_lan_dates: async () => {
+        return await electron.ipcRenderer.invoke("get-lan-dates");
+    },
+    update_lan_dates: async (lanDates: LanDatesType[]) => {
+        return await electron.ipcRenderer.invoke("update-lan-dates", lanDates);
     }
+
 } satisfies Window['electron']);

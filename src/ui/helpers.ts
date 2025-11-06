@@ -8,3 +8,30 @@ export function GetPriceAndHappyHour(product: Product): [number, boolean] {
   }
   return [product.price, is_happy_hour];
 }
+
+// Takes already existing dates from the selected product and converts them to a format to output to the datetime-local input field
+// Converts to the format 'YYYY-MM-DDTHH:mm'
+//export function formatDateTime(date: string | number | Date ): string {
+//    const d = new Date(date);
+//    const pad = (n: number) => n.toString().padStart(2, '0');
+//    return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+//}
+
+// Takes a Date object and converts to format for html date input field
+// Converts to the format 'YYYY-MM-DD'
+//export function formatDate(date: string | number | Date): string {
+//  const d = new Date(date);
+//  const pad = (n: number) => n.toString().padStart(2, '0');
+//  return `${d.getFullYear().toString().padStart(4, '0')}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+//}
+
+export function formatDate(date: string | number | Date, format: 'datetime' | 'date') {
+  const d = new Date(date);
+  const pad = (n: number) => n.toString().padStart(2, '0');
+  let formattedDate = `${d.getFullYear().toString().padStart(4, '0')}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+  if (format === 'date') {
+    return formattedDate;
+  } else {
+    return (formattedDate + `T${pad(d.getHours())}:${pad(d.getMinutes())}`);
+  }
+}

@@ -31,7 +31,7 @@ const db = new sqlite3.Database(dbPath, (err) => {
 // Used for INSERT, UPDATE, DELETE queries, and returns the last inserted ID for INSERT queries
 // Returns as promise to ensure async/await compatibility
 // Prevents duplicating code
-function runAsync(sql: string, params: any): Promise<number> {
+async function runAsync(sql: string, params: any): Promise<number> {
   return new Promise((resolve, reject) => {
     db.run(sql, params, function (err) {
       if (err) reject(err);
@@ -400,9 +400,11 @@ export async function ExportDatabase(window: Electron.BrowserWindow): Promise<vo
         { name: "All Files", extensions: ["*"] }
       ]
     });
+    // Checks if the user canceled
+    if (result.canceled) { return; }
 
-    // Checks if the user canceled the dialog or provided an invalid file path
-    if (result.canceled || !result.filePath || result.filePath === "") {
+    // Checks if the user provided an invalid file path
+    if (!result.filePath || result.filePath === "") {
       dialog.showErrorBox("Exportering af database", "Denne filsti er desværre ikke valid");
       return;
     }
@@ -438,9 +440,170 @@ export async function ExportDatabase(window: Electron.BrowserWindow): Promise<vo
 }
 
 // Function to import the initial database by overwriting the current database file
-export function ImportDatabase() {
-  fs.copyFileSync(path.join(process.resourcesPath, "public", "database.db"), dbPath);
-  return;
+export async function ImportDatabase(window: Electron.BrowserWindow) {
+  // Uses the built in dialog showOpenDialog to let the user select a database from their own PC
+  const result = await dialog.showOpenDialog(window, {
+    title: "Vælg database", 
+    filters: [
+      {name: 'Database', extensions: ['db']}
+    ],
+    properties: [
+      'openFile',
+      'dontAddToRecent'
+    ]
+  });
+  // Checks if the user canceled
+  if (result.canceled) { return false; }
+
+  // Checks that a proper file is chosen
+  if (result.filePaths.length === 0 || result.filePaths[0] === "" || !result.filePaths[0].endsWith('.db')) {
+    dialog.showErrorBox("Importering af database", "Denne fil er desværre ikke valid");
+    return false;
+  }
+
+  // Checks that the database structure is valid
+  const isValidStructure = await CheckDatabaseStructure(result.filePaths[0]);
+  if (!isValidStructure) {
+    dialog.showErrorBox("Importering af database", "Databasen har ikke den nødvendige struktur");
+    return false;
+  }
+
+  // Copies the file from the user PC to the dbPath defined in the top of this file
+  try {
+    fs.copyFileSync(result.filePaths[0], dbPath);
+  } catch {
+    return false;
+  }
+  return true;
 }
 
-export default db;
+// Function to delete all data from the database
+export function ResetDatabase() {
+  // Adds an alert to make sure the user wants to reset the database. They have the posibility to cancel
+  const confirmed = window.confirm("Er du sikker på at du vil nulstille databasen? Husk at gemme den gamle version først.");
+  if (!confirmed) {
+    return;
+  }
+
+  // List of all table names
+  const tableNames = ["products", "sales", "happy_hours", "users", "lan_dates", "settings"];
+  // Delete all data from all the tables
+  for (const tableName of tableNames) {
+    runAsync(`DELETE FROM ${tableName}`, {});
+  }
+}
+
+// Function to fetch all the LAN dates from the database (The async and promise is not needed technically)
+export async function GetLanDates() {
+  return new Promise((resolve, reject) => {
+    // Fetches all the rows in the lan_dates table
+    db.all<LanDatesType>("SELECT start_date, end_date FROM lan_dates", (error, rows) => {
+      if (error) {
+        reject(error);
+        return;
+      }
+
+      // Maps each row as a LanDatesType to in the end return a list of LanDatesType to the lanDates variable
+      const lanDates = rows.map((row: any): LanDatesType => ({
+        startDate: new Date(row.start_date),
+        endDate: new Date(row.end_date)
+      }));
+
+      // Resolves the promise with the list of lan dates
+      resolve(lanDates);
+    });
+  })
+}
+
+// Function to update the lan dates in the database
+export async function UpdateLanDates(lanDates: LanDatesType[]) {
+  return new Promise(async (resolve, reject) => {
+    try {
+      // Clears the database table to be able to insert all dates without needing to check for duplicates
+      await runAsync("DELETE FROM lan_dates", {});
+
+      // Goes through every item in the lanDates list and adds it to the database
+      for (const {startDate, endDate} of lanDates) {
+        await runAsync("INSERT INTO lan_dates(start_date, end_date) VALUES($start_date, $end_date)", {
+          $start_date: startDate,
+          $end_date: endDate
+        });
+      }
+    } catch (error) {
+      reject(error);
+    }
+    resolve(true);
+  });
+}
+
+// Check if a database has the nessessary table structure
+async function CheckDatabaseStructure(alt_dbPath: string) {
+  // Establishes a temporary connection to the alternative database file
+  const alt_db = new sqlite3.Database(alt_dbPath, (err) => {
+    if (err) {
+      //log.info('Database opening error: ', err); // Uncomment to enable logging
+      return false;
+    } else {
+      //log.info("Database opened successfully"); // Uncomment to enable logging
+    }
+  });
+
+  // Defines a list of required tables and their essential columns
+  const tableRequirements: {tableName: string, requiredColumns: string[]}[] = [
+    { tableName: "products", requiredColumns: ["id", "barcode", "brand", "name", "price", "bought_price", "stock", "happy_hour_price", "is_deleted", "image"] },
+    { tableName: "sales", requiredColumns: ["id", "transaction_id", "product_id", "quantity", "price_per_unit", "total_price", "is_prize", "is_happy_hour_purchase", "sale_date", "loss"] },
+    { tableName: "happy_hours", requiredColumns: ["id", "product_id", "start_time", "end_time"] },
+    { tableName: "users", requiredColumns: ["id", "username", "password"] },
+    { tableName: "lan_dates", requiredColumns: ["id", "start_date", "end_date"] },
+    { tableName: "settings", requiredColumns: ["id", "key", "value"] },
+  ]
+
+  // Checks each table for existence and required columns
+  for (const {tableName, requiredColumns} of tableRequirements) {
+    // Checks if the table exists
+    const tableExists: boolean = await new Promise((resolve, reject) => {
+      alt_db.get(`SELECT name FROM sqlite_master WHERE type='table' AND name=?`, [tableName], (err, row) => {
+        if (err) {
+          reject(err);
+          return false;
+        }
+        resolve(!!row);
+      });
+    });
+
+    if (!tableExists) {
+      // If the table doesn't exist, log an error and return
+      //log.info(`Table ${tableName} is missing from the database`); // Uncomment to enable logging
+      return false;
+    }
+
+    // Checks if the table has the required columns
+    const columns: string[] = await new Promise((resolve, reject) => {
+      alt_db.all(`PRAGMA table_info(${tableName})`, (err, rows) => {
+        if (err) {
+          reject(err);
+          return false;
+        }
+        resolve(rows.map((row: any) => row.name));
+      });
+    });
+
+    for (const column of requiredColumns) {
+      if (!columns.includes(column)) {
+        // If a required column is missing, log an error
+        //log.info(`Table ${tableName} is missing required column ${column}`); // Uncomment to enable logging
+        return false;
+      }
+    }
+  }
+
+  // Closes the temporary database connection
+  alt_db.close((err) => {
+    if (err) {
+      //log.info('Error closing database: ', err); // Uncomment to enable logging
+    } else {
+      //log.info("Database closed successfully"); // Uncomment to enable logging
+    }
+  });
+  return true;
+}

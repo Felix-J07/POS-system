@@ -2,9 +2,15 @@ import { useEffect, useState } from "react";
 import { GetSales } from "./database";
 import './static/Statistics.css';
 
+// Chartjs library
+import { Chart as ChartJS } from "chart.js";
+import { Bar, Doughnut, Line } from "react-chartjs-2";
+
+
 // Props for the Statistics component (type checking)
 type StatisticsProps = {
-    products: Product[]
+    products: Product[],
+    lanDates: LanDatesType[]
 }
 
 // Show sales statistics NOT DONE
@@ -13,7 +19,7 @@ type StatisticsProps = {
 // Filter by date range NOT DONE
 // Filter by product category NOT DONE
 // Future: Export statistics as CSV or PDF NOT DONE
-function Statistics({products}: StatisticsProps) {
+function Statistics({products, lanDates}: StatisticsProps) {
     // Sale statistics state
     const [saleStatistics, setSaleStatistics] = useState<SaleStatistics[]>([]);
 
@@ -31,17 +37,17 @@ function Statistics({products}: StatisticsProps) {
         if (target) target.hidden = false;
     }
 
-    // Filter sales statistics to only include the last three LAN events NOT DONE
-    function FilterToThreeLAN() {
+    // Filter sales statistics to only include the last One LAN events NOT DONE
+    function FilterToOneLAN() {
         // Test with 12 months
         const twelveMonthsAgo = new Date();
         twelveMonthsAgo.setMonth(twelveMonthsAgo.getMonth() - 12);
         return saleStatistics.filter(sale => sale.datetime > twelveMonthsAgo);
     }
 
-    // Calculate total sales in the last three LAN events
-    function SalesInThreeLAN(): string {
-        return SalesAccumulated(FilterToThreeLAN());
+    // Calculate total sales in the last One LAN events
+    function SalesInOneLAN(): string {
+        return SalesAccumulated(FilterToOneLAN());
     }
 
     // Calculate total sales from a list of sales statistics
@@ -49,9 +55,9 @@ function Statistics({products}: StatisticsProps) {
         return statistics.reduce((sum, item) => sum + item.total_sale_price, 0).toFixed(2);
     }
 
-    // Calculate total profit in the last three LAN events
-    function ProfitInThreeLAN(): string {
-        return ProfitAccumulated(FilterToThreeLAN());
+    // Calculate total profit in the last One LAN events
+    function ProfitInOneLAN(): string {
+        return ProfitAccumulated(FilterToOneLAN());
     }
 
     // Calculate total profit from a list of sales statistics
@@ -70,12 +76,12 @@ function Statistics({products}: StatisticsProps) {
             <div className="statistics-cards">
                 <div className="sale-card" onClick={() => showGraph("sale-graph")}>
                     <h3>Salg</h3>
-                    <label>Sidste 3 lan: {SalesInThreeLAN()} kr</label>
+                    <label>Sidste 3 lan: {SalesInOneLAN()} kr</label>
                     <label>I alt: {SalesAccumulated(saleStatistics)} kr</label>
                 </div>
                 <div className="profit-card" onClick={() => showGraph("profit-graph")}>
                     <h3>Profit</h3>
-                    <label>Sidste 3 lan: {ProfitInThreeLAN()} kr</label>
+                    <label>Sidste 3 lan: {ProfitInOneLAN()} kr</label>
                     <label>I alt: {ProfitAccumulated(saleStatistics)} kr</label>
                 </div>
                 <div className="stock-value-card" onClick={() => showGraph("stock-value-graph")}>

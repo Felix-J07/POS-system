@@ -2,7 +2,7 @@ import { app, BrowserWindow, ipcMain } from "electron"
 import * as path from "path";
 import { isDev } from "./util.js";
 //import log from "electron-log"; // For debugging purposes
-import { GetProducts, AddProduct, UpdateProduct, DeleteProduct, GetSales, AddSale, UpdateProductStock, ExportDatabase, Login, ImportDatabase } from "./database.js";
+import { GetProducts, AddProduct, UpdateProduct, DeleteProduct, GetSales, AddSale, UpdateProductStock, Login, ExportDatabase, ImportDatabase, ResetDatabase, GetLanDates, UpdateLanDates } from "./database.js";
 
 // Change log levels
 //log.transports.console.level = "silly"; // everything goes to terminal
@@ -37,55 +37,73 @@ app.on('ready', () => {
     }
 
     // IPC handlers for communication between the main and renderer processes
-    ipcMain.handle("get-products", async (event) => {
+    ipcMain.handle("get-products", async (_) => {
         const products = await GetProducts();
         return products;
     });
 
-    ipcMain.handle("add-product", async (event, product) => {
+    ipcMain.handle("add-product", async (_, product) => {
         const confirmation = await AddProduct(product);
         return confirmation;
     });
 
-    ipcMain.handle("update-product", async (event, product) => {
+    ipcMain.handle("update-product", async (_, product) => {
         const confirmation = await UpdateProduct(product);
         return confirmation;
     });
 
-    ipcMain.handle("delete-product", async (event, productId) => {
+    ipcMain.handle("delete-product", async (_, productId) => {
         const confirmation = await DeleteProduct(productId);
         return confirmation;
     });
 
-    ipcMain.handle("get-sales", async (event, condition?: string, params?: Object) => {
+    ipcMain.handle("get-sales", async (_, condition?: string, params?: Object) => {
         const sales = await GetSales(condition, params);
         return sales;
     });
 
-    ipcMain.handle("add-sale", async (event, sale) => {
+    ipcMain.handle("add-sale", async (_, sale) => {
         const confirmation = await AddSale(sale);
         return confirmation;
     });
 
-    ipcMain.handle("update-product-stock", async (event, sale) => {
+    ipcMain.handle("update-product-stock", async (_, sale) => {
         const confirmation = await UpdateProductStock(sale);
         return confirmation;
     });
 
-    ipcMain.handle("export-database", async (event) => {
-        const confirmation = await ExportDatabase(mainWindow);
-        return confirmation;
-    });
-
-    ipcMain.handle("login", async (event, {username, password}) => {
+    ipcMain.handle("login", async (_, {username, password}) => {
         const confirmation = await Login(username, password);
         return confirmation;
     });
 
-    ipcMain.handle("import-database", (event) => {
-        ImportDatabase();
+    ipcMain.handle("export-database", async (_) => {
+        const confirmation = await ExportDatabase(mainWindow);
+        return confirmation;
+    });
+
+    ipcMain.handle("import-database", async (_) => {
+        const confirmation = await ImportDatabase(mainWindow);
+        if (confirmation) {
+            mainWindow.webContents.reloadIgnoringCache();
+        }
         return;
+    });
+
+    ipcMain.handle("reset-database", (_) => {
+        ResetDatabase();
+        return
     })
+
+    ipcMain.handle("get-lan-dates", async (_) => {
+        const lanDates = await GetLanDates();
+        return lanDates;
+    });
+
+    ipcMain.handle("update-lan-dates", async (_, lanDates) => {
+        const confirmation = await UpdateLanDates(lanDates);
+        return confirmation;
+    });
 });
 
 // Quit the app when all windows are closed

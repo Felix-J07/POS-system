@@ -1,0 +1,182 @@
+/* --- Global reset for consistent look --- */
+.lan-dates-modal-form,
+.lan-dates-modal {
+  font-family: "Inter", system-ui, sans-serif;
+  color: #2e2e2e;
+}
+
+/* --- Labels --- */
+.lan-dates-modal label {
+  display: block;
+  margin-bottom: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  color: #444;
+}
+
+/* --- Input fields --- */
+.lan-dates-modal-form input {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 14px;
+  background-color: #fafafa;
+  color: #333;
+  box-sizing: border-box;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
+}
+
+.lan-dates-modal-form input:hover {
+  background-color: #f3f3f3;
+}
+
+.lan-dates-modal-form input:focus {
+  border-color: #007bff;
+  box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.2);
+  outline: none;
+}
+
+.lan-dates-modal-form input:disabled {
+  background-color: #e0e0e0;
+  color: #888;
+}
+
+/* --- Button row (footer) --- */
+.lan-dates-modal-form-buttons,
+.modal-buttons {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 24px;
+}
+
+/* --- General button styling --- */
+.save-button,
+.cancel-button,
+.add-lan-date {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 18px;
+  border: none;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.25s ease, transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.save-button:hover,
+.cancel-button:hover,
+.add-lan-date:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+}
+
+/* --- Primary button (Save) --- */
+.save-button {
+  background: #007bff;
+  color: #fff;
+}
+
+.save-button:hover {
+  background: #0056b3;
+}
+
+/* --- Secondary button (Cancel) --- */
+.cancel-button {
+  background: #f1f3f5;
+  color: #333;
+}
+
+.cancel-button:hover {
+  background: #e0e0e0;
+}
+
+/* --- LAN Date List --- */
+.lan-dates-modal {
+  margin-top: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* --- Section heading (if used) --- */
+.lan-dates-modal h4 {
+  margin-bottom: 12px;
+  font-size: 16px;
+  font-weight: 600;
+  color: #222;
+}
+
+/* --- Individual Date Row --- */
+.lan-date-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background-color: #f8f9fa;
+  padding: 8px 10px;
+  border-radius: 6px;
+  transition: background-color 0.2s ease;
+  width: 90%;
+  align-self: center;
+}
+
+.lan-date-row:hover {
+  background-color: #eef1f4;
+}
+
+/* --- Date inputs inside row --- */
+.lan-date-row input[type="date"] {
+  flex: 1 1 0;
+  padding: 8px 10px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  background-color: #fff;
+  font-size: 14px;
+  color: #333;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  text-align: center;
+}
+
+.lan-date-row input[type="date"]:focus {
+  border-color: #007bff;
+  box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.15);
+}
+
+.lan-date-row input[type="date"]:hover {
+  cursor: pointer;
+}
+
+/* --- Trash icon (remove button) --- */
+.lan-date-row .remove-lan-date {
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: white;
+  color: #888;
+  border-radius: 6px;
+  flex: 0 0 auto;
+  transition: color 0.2s ease, background-color 0.2s ease;
+}
+
+.lan-date-row .remove-lan-date:hover {
+  color: #dc3545;
+  background-color: #ffe6e6;
+  cursor: pointer;
+}
+
+/* --- Add date button --- */
+.add-lan-date {
+  background-color: #007bff;
+  color: white;
+  align-self: flex-start;
+  margin-top: 12px;
+}
+
+.add-lan-date:hover {
+  background-color: #0056b3;
+}

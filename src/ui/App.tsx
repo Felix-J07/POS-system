@@ -9,7 +9,7 @@ import Storage from './Storage'
 import Statistics from './Statistics'
 import Settings from './Settings'
 import Login from './Login'
-import { GetProducts } from './database'
+import { GetProducts, GetLanDates } from './database'
 import { GetPriceAndHappyHour } from './helpers'
 
 // React functional component for the entire app
@@ -19,14 +19,14 @@ function App() {
   const [logged_in, setLogged_in] = useState<boolean>(false);
 
   // UseState for the list of products
-  const [products, setProducts] = useState<Product[]>([]) // Array of products from the database
+  const [products, setProducts] = useState<Product[]>([]); // Array of products from the database
   // Set product on product cards when app starts up
   useEffect(() => {
     GetProducts({ setProducts });
   }, []);
   
   // UseState for the cart
-  const [cart, setCart] = useState<CartType>({ cartProducts: [] as CartType['cartProducts'], totalPrice: 0 })
+  const [cart, setCart] = useState<CartType>({ cartProducts: [] as CartType['cartProducts'], totalPrice: 0 });
   // Update cart if products change in the database
   useEffect(() => {
     setCart(prevCart => {
@@ -49,7 +49,14 @@ function App() {
   }, [products]);
 
   // UseState for the current sale
-  const [sale, setSale] = useState<Sale | null>(null)
+  const [sale, setSale] = useState<Sale | null>(null);
+
+  // UseState for list of LAN dates to be able to filter in statistics
+  const [lanDates, setLanDates] = useState<LanDatesType[]>([]);
+  // Populate the lanDates useState on startup
+  useEffect(() => {
+    GetLanDates(setLanDates)
+  }, [])
 
   // If a key on keyboard is pressed, or if the barcode scanner scans a product, focus the barcode input field
   // Barcode scanners usually emulate keyboard input, so this works for both (Works for the scanner used by LAN during development)
@@ -77,10 +84,10 @@ function App() {
           {logged_in ? (
             <>
               <Route path="/" element={<Index products={products} cart={cart} setCart={setCart} setProducts={setProducts} setSale={setSale} />} />
-              <Route path="/checkout" element={<Checkout setCart={setCart} sale={sale} setSales={setSale} setProducts={setProducts} />} />
+              <Route path="/checkout" element={<Checkout setCart={setCart} sale={sale} setProducts={setProducts} />} />
               <Route path="/storage" element={<Storage products={products} setProducts={setProducts} />} />
-              <Route path="/statistics" element={<Statistics products={products} />} />
-              <Route path="/settings" element={<Settings />} />
+              <Route path="/statistics" element={<Statistics products={products} lanDates={lanDates} />} />
+              <Route path="/settings" element={<Settings lanDates={lanDates} setLanDates={setLanDates} />} />
             </>
           ) : (
             <Route path="*" element={<Login setLogged_in={setLogged_in} />} />

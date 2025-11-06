@@ -48,7 +48,7 @@ function Storage({ products, setProducts }: StorageProps) {
                     ))}
                 </div>
             </div>
-            {modalVisible && selectedProduct && <Modal setModalVisible={setModalVisible} modal_content={<ProductModal selectedProduct={selectedProduct} setSelectedProduct={setSelectedProduct} setModalVisible={setModalVisible} setProducts={setProducts} />} />}
+            {modalVisible && selectedProduct && <Modal setModalVisible={setModalVisible} modal_content={<ProductModal selectedProduct={selectedProduct} setSelectedProduct={setSelectedProduct} setModalVisible={setModalVisible} setProducts={setProducts} />} title={selectedProduct.id === -1 ? "Tilføj Produkt" : "Rediger Produkt"} />}
         </>
     );
 }

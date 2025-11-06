@@ -3,7 +3,7 @@ export function GetProducts({ setProducts }: { setProducts: React.Dispatch<React
     window.electron.get_products().then((products: Product[]) => {
         // Safety check to ensure the database is returning products
         if (products === undefined) {
-            console.error("Products is undefined in ProductShowcase.tsx");
+            console.error("Fejl i databasen (produkter)");
             return;
         }
         // Update the state with the fetched products
@@ -28,7 +28,15 @@ export function DeleteProduct(productId: number, setProducts: React.Dispatch<Rea
 
 // Fetching sales from the database and adding them to the sales statistics state
 export async function GetSales(setSaleStatistics: React.Dispatch<React.SetStateAction<SaleStatistics[]>>, condition?: string, params?: Object) {
-    window.electron.get_sales(condition, params).then((sales: SaleStatistics[]) => setSaleStatistics(sales));
+    window.electron.get_sales(condition, params).then((sales: SaleStatistics[]) => {
+        // Safety check to ensure the database is returning sales
+        if (sales === undefined) {
+            console.log("Fejl i databasen (salg)");
+            return;
+        }
+        // Update the state with the fetched sales
+        setSaleStatistics(sales);
+    });
 }
 
 // Adding a new sale to the database
@@ -46,8 +54,7 @@ export function ExportDatabase() {
     window.electron.export_database();
 }
 
-// Temporary way of updating the database in AppData on user's computer
-// In the future, this should be replaced with a proper file dialog to select the database file on the user's computer
+// Lets the user import a database file into the application (AppData on the PC)
 export function ImportDatabase() {
     // Add an alert where the user confirms or denies the import
     const confirmed = window.confirm("Er du sikker på at du vil importere databasen? Databasen vil blive overskrevet.");
@@ -56,4 +63,19 @@ export function ImportDatabase() {
     }
 
     window.electron.import_database();
+}
+
+export function GetLanDates(setLanDates: React.Dispatch<React.SetStateAction<LanDatesType[]>>) {
+    window.electron.get_lan_dates().then((lanDates: LanDatesType[]) => {
+        if (lanDates === undefined) {
+            console.log("Fejl i databasen (LAN datoer)");
+            return;
+        }
+        // Update the state with the fetched lan dates
+        setLanDates(lanDates);
+    })
+}
+
+export function UpdateLanDates(lanDates: LanDatesType[], setLanDates: React.Dispatch<React.SetStateAction<LanDatesType[]>>) {
+    window.electron.update_lan_dates(lanDates).then(() => GetLanDates(setLanDates));
 }

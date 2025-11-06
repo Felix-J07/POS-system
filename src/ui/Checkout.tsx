@@ -5,7 +5,6 @@ import { AddSale, UpdateProductStock } from './database';
 // TypeScript type checking for props
 type Props = {
     sale: Sale | null,
-    setSales: React.Dispatch<React.SetStateAction<Sale | null>>,
     setCart: React.Dispatch<React.SetStateAction<CartType>>,
     setProducts: React.Dispatch<React.SetStateAction<Product[]>>
 };
