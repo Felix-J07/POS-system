@@ -55,4 +55,4 @@ This is a Point-Of-Sale (POS) System made for the Rybners HTX LAN committee. It 
 
 ## Be aware
 
-If an older version of the app has run on the device, and the app has an updated database file, the updated database file will not be used. The app uses the old database already saved in the `AppData` folder. Therefore the Import Database button on the Settings page.
+If an older version of the app has run on the device previously, and the app has an updated database file, the updated database file will not be used. The app uses the old database already saved in the `AppData` folder. Therefore use the Import Database button on the Settings page.
