@@ -47,6 +47,23 @@ electron.contextBridge.exposeInMainWorld('electron', {
     },
     update_lan_dates: async (lanDates: LanDatesType[]) => {
         return await electron.ipcRenderer.invoke("update-lan-dates", lanDates);
+    },
+    get_expenses: async () => {
+        return await electron.ipcRenderer.invoke("get-expenses");
+    },
+    add_expense: async (expense: Expenses) => {
+        return await electron.ipcRenderer.invoke("add-expense", expense);
+    },
+    delete_expense: async (id: number) => {
+        return await electron.ipcRenderer.invoke("delete-expense", id);
+    },
+    get_users: async () => {
+        return await electron.ipcRenderer.invoke("get-users");
+    },
+    add_user: async (user: User) => {
+        return await electron.ipcRenderer.invoke("add-user", user);
+    },
+    delete_user: async (id: number) => {
+        return await electron.ipcRenderer.invoke("delete-user", id);
     }
-
 } satisfies Window['electron']);

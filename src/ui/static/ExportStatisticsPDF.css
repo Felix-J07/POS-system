@@ -1,0 +1,156 @@
+/* ===== Print baseline ===== */
+@page {
+    size: A4;
+    margin: 20mm;
+}
+
+body {
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 11px;
+    color: #000;
+    margin: 0;
+}
+
+h1 {
+    font-size: 20px;
+    margin-bottom: 12px;
+}
+
+h2 {
+    font-size: 15px;
+    margin: 32px 0 8px;
+    border-bottom: 2px solid #000;
+    padding-bottom: 4px;
+}
+
+h3 {
+    font-size: 13px;
+    margin: 24px 0 6px;
+}
+
+/* ===== Tables ===== */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 16px;
+    page-break-inside: avoid;
+}
+
+caption {
+    caption-side: top;
+    text-align: left;
+    font-weight: bold;
+    margin-bottom: 6px;
+}
+
+th, td {
+    border: 1px solid #000;
+    padding: 6px 8px;
+    vertical-align: middle;
+}
+
+thead th {
+    background: #eaeaea;
+    font-weight: bold;
+}
+
+tfoot th {
+    font-weight: bold;
+}
+
+/* Tal justering */
+td.numeric {
+    text-align: right;
+    white-space: nowrap;
+}
+
+/* Summary tables */
+.summary-table {
+    width: 60%;
+}
+
+.summary-table th {
+    width: 70%;
+    text-align: left;
+}
+
+/* Sideopdeling */
+.page-break {
+    page-break-before: always;
+}
+
+* {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+}
+
+/* Screen vs print separation */
+@media screen {
+    .print-area {
+        max-width: 1100px;
+        margin: 0 auto;
+        padding: 16px;
+        background: #fff;
+    }
+}
+
+@media print {
+    /* Hide UI when printing */
+    .no-print {
+        display: none !important;
+    }
+
+    /* Use full page width when printing */
+    .print-area {
+        padding: 0;
+        margin: 0;
+    }
+
+    /* Avoid odd clipping caused by app wrappers */
+    html, body {
+        height: auto;
+        overflow: visible !important;
+    }
+
+    /* Improve page breaking behavior */
+    table {
+        page-break-inside: auto;
+    }
+
+    thead {
+        display: table-header-group; /* repeat header on each printed page */
+    }
+
+    tfoot {
+        display: table-footer-group;
+    }
+
+    tr, td, th {
+        break-inside: avoid;         /* modern */
+        page-break-inside: avoid;    /* legacy */
+    }
+
+    /* Your manual page breaks */
+    .page-break {
+        break-before: page;         /* modern */
+        page-break-before: always;  /* legacy */
+    }
+}
+
+/* Table layout improvements for print */
+table {
+    table-layout: fixed; /* prevents columns from jumping and helps wrapping */
+}
+
+th, td {
+    word-wrap: break-word;
+    overflow-wrap: anywhere;
+}
+
+.numeric .negative-profit {
+    color: red;
+}
+
+.numeric .positive-profit {
+    color: black;
+}

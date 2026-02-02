@@ -18,7 +18,7 @@ export function LanDatesModal({lanDates, setLanDates, setModalVisible}: LanDates
         const updatedDates = tempLanDates.map((ts, i) =>
             i === index ? { ...ts, [field]: new Date(value) } : ts
         );
-        console.log(updatedDates);
+        
         setTempLanDates(updatedDates);
     }
 
@@ -66,6 +66,8 @@ export function LanDatesModal({lanDates, setLanDates, setModalVisible}: LanDates
                     // End date is before or equal to start date, skip this date
                     endDate = startDate;
                 }
+                startDate.setHours(0,0,0,0);
+                endDate.setHours(23,59,59,99);
                 updatedLanDates.push({
                     startDate: startDate,
                     endDate: endDate

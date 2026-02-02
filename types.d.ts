@@ -41,6 +41,7 @@ type Sale = {
 
 type SaleStatistics = {
     id: number, // Unique identifier for the sale in the database
+    transaction_id: number, // Identifier for the transaction to be able to find other sales from the same transaction
     datetime: Date, // Date and time of the sale
     total_sale_price: number, // Total price of the sale
     soldProduct: {
@@ -55,8 +56,22 @@ type SaleStatistics = {
 
 // Inserted lan dates to show in statistics
 type LanDatesType = {
+    id?: number,
     startDate: Date,
     endDate: Date
+}
+
+type Expenses = {
+    id?: number,
+    lanDateId: number,
+    description: string,
+    amount: number
+}
+
+type User = {
+    id?: number,
+    username: string,
+    password: string
 }
 
 // Extend the Window interface to include the electron API
@@ -76,5 +91,11 @@ interface Window {
         reset_database: () => void;
         get_lan_dates: () => Promise<LanDatesType[]>;
         update_lan_dates: (lanDates: LanDatesType[]) => Promise<void>;
+        get_expenses: () => Promise<Expenses[]>;
+        add_expense: (expense: Expenses) => Promise<boolean>;
+        delete_expense: (id: number) => Promise<boolean>;
+        get_users: () => Promise<User[]>;
+        add_user: (user: User) => Promise<boolean>;
+        delete_user: (id: number) => Promise<boolean>;
     }
 }

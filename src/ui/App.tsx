@@ -100,6 +100,20 @@ function App() {
 
 // Component for the main page showing the product showcase and the cart
 function Index({ products, cart, setCart, setProducts, setSale }: { products: Product[], cart: CartType, setCart: React.Dispatch<React.SetStateAction<CartType>>, setProducts: React.Dispatch<React.SetStateAction<Product[]>>, setSale: React.Dispatch<React.SetStateAction<Sale | null>> }): JSX.Element {
+  // Changes the main-container minWidth based on the page
+  useEffect(() => {
+    const element = document.querySelector(".main-container");
+    if (element instanceof HTMLElement) {
+      element.style.minWidth = `${600 + 80 + 24 + 30}px`;
+    }
+
+    return () => {
+      if (element instanceof HTMLElement) {
+        element.style.minWidth = ""; // clean up on unmount
+      }
+    };
+  }, []);
+
   return (
     <>
       <ProductShowcase products={products} cart={cart} setCart={setCart} setProducts={setProducts} />

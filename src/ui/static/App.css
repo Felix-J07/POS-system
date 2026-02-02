@@ -39,7 +39,7 @@
     box-sizing: border-box;
     gap: 24px;
     padding: 1px;
-    min-width: calc(600px + 80px + 24px + 30px); /* Ensures minimum width for content and sidebar */
+    /*min-width: calc(600px + 80px + 24px + 30px); /* Ensures minimum width for content and sidebar */
     overflow: hidden; /* Prevents the main-container from overflowing */
     margin-left: 85px; /* Pushes content to the right */
 }

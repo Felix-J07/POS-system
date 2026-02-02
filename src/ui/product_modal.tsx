@@ -1,5 +1,5 @@
 import { Trash, Plus } from 'lucide-react';
-import { AddProduct, UpdateProduct, DeleteProduct, GetProducts } from './database';
+import { AddProduct, UpdateProduct, DeleteProduct } from './database';
 import './static/product_modal.css';
 import type { JSX } from 'react';
 import { formatDate } from './helpers';
@@ -14,7 +14,7 @@ type ProductModalProps = {
 }
 
 // Content in the Modal function for when the user adds a new product or edits an existing product
-export function ProductModal({ selectedProduct, setSelectedProduct, setModalVisible, setProducts }: ProductModalProps): JSX.Element {
+export function ProductModal({ selectedProduct, setModalVisible, setProducts }: ProductModalProps): JSX.Element {
     // Set a temporary state for the happy hour timestamps of the selected product to not directly modify the selected product state
     const [tempHappyHourTimestamps, setTempHappyHourTimestamps] = useState(selectedProduct.happy_hour_timestamps);
 
@@ -90,7 +90,7 @@ export function ProductModal({ selectedProduct, setSelectedProduct, setModalVisi
             brand: form.get("brand") as string,
             name: form.get("name") as string,
             price: parseFloat(form.get("price") as string) || 0,
-            bought_price: selectedProduct.bought_price,
+            bought_price: parseFloat(form.get("bought_price") as string) || 0,
             stock: parseInt(form.get("stock") as string) || 0,
             image: form.get("image") as string,
             happy_hour_timestamps: happy_hour_timestamps,

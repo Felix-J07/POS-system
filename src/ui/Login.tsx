@@ -1,5 +1,6 @@
 import './static/Login.css'
 import React from 'react'
+import { CheckLoginCredentials } from './database';
 
 // Define the props for the Login component for type checking
 type LoginProps = {
@@ -24,7 +25,7 @@ function Login({setLogged_in}: LoginProps): React.JSX.Element {
             // Call the login API and handle the response
             // If anything is returned, set the logged_in state to true
             // Otherwise, alert the user about invalid credentials
-            window.electron.login(username, password).then((res) => {
+            CheckLoginCredentials(username, password).then((res) => {
                 if (res) {
                     setLogged_in(true);
                 } else {

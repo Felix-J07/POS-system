@@ -19,7 +19,7 @@ if (!fs.existsSync(dbPath)) {
 }
 
 // Initialize the database connection
-const db = new sqlite3.Database(dbPath, (err) => {
+let db = new sqlite3.Database(dbPath, (err) => {
     if (err) {
       //log.info('Database opening error: ', err); // Uncomment to enable logging
     } else {
@@ -201,12 +201,13 @@ export async function UpdateProduct(product: Product) {
     await InsertHappyHourTimestamps(product, product.id);
 
     // Updates the product using runAsync
-    await runAsync("UPDATE products SET barcode = $barcode, brand = $brand, name = $name, price = $price, stock = $stock, happy_hour_price = $happy_hour_price, image = $image, updated_at = $updated_at WHERE id = $id", 
+    await runAsync("UPDATE products SET barcode = $barcode, brand = $brand, name = $name, price = $price, bought_price = $bought_price, stock = $stock, happy_hour_price = $happy_hour_price, image = $image, updated_at = $updated_at WHERE id = $id", 
     {
       $barcode: product.barcode,
       $brand: product.brand,
       $name: product.name,
       $price: product.price,
+      $bought_price: product.bought_price,
       $stock: product.stock,
       $happy_hour_price: product.happy_hour_price,
       $image: product.image,
@@ -254,6 +255,7 @@ export async function GetSales(condition?: string, params?: Record<string, any>)
       const sales: SaleStatistics[] = await Promise.all(
         rows.map(async (row: database_sales) => ({
           id: row.id,
+          transaction_id: row.transaction_id,
           datetime: new Date(row.sale_date),
           total_sale_price: row.total_price,
           soldProduct: {
@@ -310,7 +312,7 @@ export async function AddSale(sale: Sale): Promise<boolean> {
             // Inserts subsequent products in the sale with the same transactionId
             if (!transactionId) throw new Error("Transaction ID is undefined for subsequent products");
             await runAsync(
-              "INSERT INTO sales(transaction_id, product_id, quantity, price_per_unit, total_price, is_prize, is_happy_hour_purchase) VALUES($transaction_id, $product_id, $quantity, $price_per_unit, $total_price, $is_prize, $is_happy_hour_purchase)",
+              "INSERT INTO sales(transaction_id, product_id, quantity, price_per_unit, total_price, is_prize, is_happy_hour_purchase, loss) VALUES($transaction_id, $product_id, $quantity, $price_per_unit, $total_price, $is_prize, $is_happy_hour_purchase, $loss)",
               {
                 $transaction_id: transactionId,
                 $product_id: product.id,
@@ -329,7 +331,7 @@ export async function AddSale(sale: Sale): Promise<boolean> {
       } catch (error) {
         // db.run("ROLLBACK");
         //log.info(error);
-        reject(false);
+        reject(error);
       }
     });
   });
@@ -470,10 +472,15 @@ export async function ImportDatabase(window: Electron.BrowserWindow) {
 
   // Copies the file from the user PC to the dbPath defined in the top of this file
   try {
+    db.close();
     fs.copyFileSync(result.filePaths[0], dbPath);
-  } catch {
+    dialog.showMessageBox(window, { type: "info", buttons: ['Ok'], title: "Databasen er importeret", message: "Databasen er importeret fra denne sti:\n" + dbPath });
+  } catch (error) {
+    if (error instanceof Error) { error = error.message; }
+    dialog.showErrorBox("En fejl er opstået", "En fejl er desværre opstået (catch)" + String(error));
     return false;
   }
+  db = new sqlite3.Database(dbPath);
   return true;
 }
 
@@ -497,7 +504,7 @@ export function ResetDatabase() {
 export async function GetLanDates() {
   return new Promise((resolve, reject) => {
     // Fetches all the rows in the lan_dates table
-    db.all<LanDatesType>("SELECT start_date, end_date FROM lan_dates", (error, rows) => {
+    db.all<LanDatesType>("SELECT id, start_date, end_date FROM lan_dates", (error, rows) => {
       if (error) {
         reject(error);
         return;
@@ -505,6 +512,7 @@ export async function GetLanDates() {
 
       // Maps each row as a LanDatesType to in the end return a list of LanDatesType to the lanDates variable
       const lanDates = rows.map((row: any): LanDatesType => ({
+        id: parseFloat(row.id || 0),
         startDate: new Date(row.start_date),
         endDate: new Date(row.end_date)
       }));
@@ -606,4 +614,111 @@ async function CheckDatabaseStructure(alt_dbPath: string) {
     }
   });
   return true;
+}
+
+export async function GetExpenses(): Promise<Expenses[]> {
+  return new Promise((resolve, reject) => {
+    // Fetches all rows in the expenses table
+    db.all<Expenses>("SELECT * FROM expenses ORDER BY id DESC", (error, rows) => {
+      if (error) {
+        reject(error);
+        return;
+      }
+
+      // Maps each row as a Expenses type to get a list of Expenses
+      const expenses = rows.map((row: any): Expenses => ({
+        id: row.id,
+        lanDateId: row.lan_date_id,
+        amount: row.amount,
+        description: row.description
+      }));
+
+      // Resolves the promise with the list of expenses
+      resolve(expenses);
+    });
+  });
+}
+
+export async function AddExpense(expense: Expenses): Promise<boolean> {
+  try {
+    // Insert expense using runAsync
+    await runAsync("INSERT INTO expenses(lan_date_id, amount, description) VALUES($lan_date_id, $amount, $description)", 
+      {
+        $lan_date_id: expense.lanDateId,
+        $amount: expense.amount,
+        $description: expense.description
+      }
+    );
+    return true;
+  } catch (err) {
+    return false;
+  }
+}
+
+export async function DeleteExpense(id: number): Promise<boolean> {
+  try {
+    // Delete expense using runAsync
+    await runAsync("DELETE FROM expenses WHERE id = $id", {$id: id});
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+export async function AddUser(user: User): Promise<boolean> {
+  try {
+    // Adding user using runAsync
+    await runAsync("INSERT INTO users(username, password) VALUES($username, $password)", {$username: user.username, $password: user.password});
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+export async function GetUsers(): Promise<User[]> {
+  return new Promise((resolve, reject) => {
+    // Fetches all rows in the users table
+    db.all<User[]>("SELECT * FROM users", (error, rows) => {
+      if (error) {
+        reject(error);
+        return;
+      }
+
+      // Maps each row as a User type to get a list of User
+      const users = rows.map((row: any): User => ({
+        id: row.id,
+        username: row.username,
+        password: row.password
+      }));
+
+      // Resolves the promise with the list of users
+      resolve(users);
+    });
+  });
+}
+
+export async function DeleteUser(id: number): Promise<boolean> {
+  return new Promise((resolve, reject) => {
+    // Fetches row count in users database
+    db.get("SELECT COUNT(id) AS row_count FROM users", async (error, row: any) => {
+      if (error) {
+        reject(error);
+        return;
+      }
+      try {
+        if (parseFloat(row.row_count) > 1) {
+          await runAsync("DELETE FROM users WHERE id = $id", {$id: id});
+          resolve(true);
+          return;
+        }
+        else {
+          resolve(false);
+          return;
+        }
+      } catch (err) {
+        reject(err);
+        return;
+      }
+    })
+  });
 }

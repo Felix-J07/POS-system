@@ -61,6 +61,14 @@ CREATE TABLE IF NOT EXISTS settings (
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
 );
 
+CREATE TABLE IF NOT EXISTS expenses (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    lan_date_id INTEGER NOT NULL,
+    amount INTEGER NOT NULL,
+    description TEXT,
+    FOREIGN KEY (lan_date_id) REFERENCES lan_dates(id)
+);
+
 -- If more tables are added go to the src/electron/database.ts to add it to the tableRequirements list
 
 --INSERT INTO products (barcode, brand, name, price, bought_price, stock, happy_hour_price, image) VALUES

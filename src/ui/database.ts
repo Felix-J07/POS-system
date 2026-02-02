@@ -34,18 +34,18 @@ export async function GetSales(setSaleStatistics: React.Dispatch<React.SetStateA
             console.log("Fejl i databasen (salg)");
             return;
         }
+
+        // Sort the sales by the datetime in descending order
+        sales.sort((a, b) => b.datetime.getTime() - a.datetime.getTime());
+
         // Update the state with the fetched sales
         setSaleStatistics(sales);
     });
 }
 
-// Adding a new sale to the database
-export function AddSale(sale: Sale) {
+// Adding a new sale to the database and updating product stock accordingly
+export function AddSale(sale: Sale, setProducts: React.Dispatch<React.SetStateAction<Product[]>>) {
     window.electron.add_sale(sale);
-}
-
-// Updating product stock based on a sale and refreshing the product list state
-export function UpdateProductStock(sale: Sale, setProducts: React.Dispatch<React.SetStateAction<Product[]>>) {
     window.electron.update_product_stock(sale).then(() => GetProducts({ setProducts }));
 }
 
@@ -78,4 +78,48 @@ export function GetLanDates(setLanDates: React.Dispatch<React.SetStateAction<Lan
 
 export function UpdateLanDates(lanDates: LanDatesType[], setLanDates: React.Dispatch<React.SetStateAction<LanDatesType[]>>) {
     window.electron.update_lan_dates(lanDates).then(() => GetLanDates(setLanDates));
+}
+
+export function GetExpenses(setExpenses: React.Dispatch<React.SetStateAction<Expenses[]>>) {
+    window.electron.get_expenses().then((expenses: Expenses[]) => {
+        if (expenses === undefined) {
+            console.log("Fejl i databasen (Udgifter)");
+            return
+        }
+        // Update expenses list
+        setExpenses(expenses);
+    })
+}
+
+export function AddExpense(expense: Expenses, setExpenses: React.Dispatch<React.SetStateAction<Expenses[]>>) {
+    window.electron.add_expense(expense).then(() => GetExpenses(setExpenses));
+}
+
+export function DeleteExpense(id: number | undefined, setExpenses: React.Dispatch<React.SetStateAction<Expenses[]>>) {
+    if (!id) {
+        console.log("Internal error (no expense id given)");
+        return;
+    }
+    window.electron.delete_expense(id).then(() => GetExpenses(setExpenses));
+}
+
+export function GetUsers(setUsers: React.Dispatch<React.SetStateAction<User[]>>) {
+    window.electron.get_users().then(users => setUsers(users));
+}
+
+export function AddUser(user: User, setUsers: React.Dispatch<React.SetStateAction<User[]>>) {
+    window.electron.add_user(user).then(() => GetUsers(setUsers));
+}
+
+export function DeleteUser(id: number, setUsers: React.Dispatch<React.SetStateAction<User[]>>) {
+    window.electron.delete_user(id).then(() => GetUsers(setUsers));
+}
+
+export async function CheckLoginCredentials(username: string, password: string): Promise<boolean> {
+    const res = await window.electron.login(username, password);
+    if (res) {
+        return true;
+    } else {
+        return false;
+    }
 }

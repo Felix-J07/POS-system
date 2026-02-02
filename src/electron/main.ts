@@ -2,12 +2,14 @@ import { app, BrowserWindow, ipcMain } from "electron"
 import * as path from "path";
 import { isDev } from "./util.js";
 //import log from "electron-log"; // For debugging purposes
-import { GetProducts, AddProduct, UpdateProduct, DeleteProduct, GetSales, AddSale, UpdateProductStock, Login, ExportDatabase, ImportDatabase, ResetDatabase, GetLanDates, UpdateLanDates } from "./database.js";
+import { GetProducts, AddProduct, UpdateProduct, DeleteProduct, GetSales, AddSale, UpdateProductStock, Login, ExportDatabase, ImportDatabase, ResetDatabase, GetLanDates, UpdateLanDates, GetExpenses, AddExpense, DeleteExpense, GetUsers, AddUser, DeleteUser } from "./database.js";
 
 // Change log levels
 //log.transports.console.level = "silly"; // everything goes to terminal
 //log.transports.file.level = "info";     // only info+ goes to file
 //Object.assign(console, log.functions);
+
+app.commandLine.appendSwitch('lang', 'da-dk');
 
 // When the app is ready (turned on), create the browser window.
 app.on('ready', () => {
@@ -92,7 +94,7 @@ app.on('ready', () => {
 
     ipcMain.handle("reset-database", (_) => {
         ResetDatabase();
-        return
+        return;
     })
 
     ipcMain.handle("get-lan-dates", async (_) => {
@@ -102,6 +104,36 @@ app.on('ready', () => {
 
     ipcMain.handle("update-lan-dates", async (_, lanDates) => {
         const confirmation = await UpdateLanDates(lanDates);
+        return confirmation;
+    });
+
+    ipcMain.handle("get-expenses", async (_) => {
+        const expenses = await GetExpenses();
+        return expenses;
+    });
+
+    ipcMain.handle("add-expense", async (_, expense) => {
+        const confirmation = await AddExpense(expense);
+        return confirmation;
+    });
+
+    ipcMain.handle("delete-expense", async (_, id) => {
+        const confirmation = await DeleteExpense(id);
+        return confirmation;
+    });
+
+    ipcMain.handle("get-users", async (_) => {
+        const users = await GetUsers();
+        return users;
+    });
+
+    ipcMain.handle("add-user", async (_, user) => {
+        const confirmation = await AddUser(user);
+        return confirmation;
+    });
+
+    ipcMain.handle("delete-user", async (_, id) => {
+        const confirmation = await DeleteUser(id);
         return confirmation;
     });
 });

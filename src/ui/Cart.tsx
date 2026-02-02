@@ -89,7 +89,7 @@ function Cart({ products, cart, setCart, setSale }: CartProps) {
           </div>
         </div>
       </div>
-      {modalVisible && <Modal setModalVisible={setModalVisible} modal_content={<PrizeModal products={products} cart={cart} setCart={setCart} />} />}
+      {modalVisible && <Modal setModalVisible={setModalVisible} modal_content={<PrizeModal products={products} cart={cart} setCart={setCart} />} title="Præmier" />}
     </>
   );
 }
@@ -277,7 +277,12 @@ function PrizeModal({ products, cart, setCart }: { products: Product[], cart: Ca
     <div>
       <h2>Tilføj præmie</h2>
       <div className='product-grid'>
-        { products.map((product) => Card(product, () => { AddPrizeToCart(product); })) }
+        { products.map((product) => {
+          if (product.stock > 0) {
+            return Card(product, () => { AddPrizeToCart(product); })
+          }
+          return null;
+        })}
       </div>
     </div>
   );

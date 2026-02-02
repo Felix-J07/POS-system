@@ -1,16 +1,31 @@
 import { Link } from 'react-router';
 import './static/Checkout.css';
-import { AddSale, UpdateProductStock } from './database';
+import { AddSale } from './database';
+import { useEffect } from 'react';
 
 // TypeScript type checking for props
 type Props = {
     sale: Sale | null,
     setCart: React.Dispatch<React.SetStateAction<CartType>>,
-    setProducts: React.Dispatch<React.SetStateAction<Product[]>>
+    setProducts: React.Dispatch<React.SetStateAction<Product[]>>,
 };
 
 // Checkout component for user to accept payment
 function Checkout({ sale, setCart, setProducts }: Props) {
+    // Changes the main-container minWidth based on the page
+    useEffect(() => {
+        const element = document.querySelector(".main-container");
+        if (element instanceof HTMLElement) {
+          element.style.minWidth = "300px";
+        }
+    
+        return () => {
+          if (element instanceof HTMLElement) {
+            element.style.minWidth = ""; // clean up on unmount
+          }
+        };
+      }, []);
+
     // If no sale is provided, display a message
     if (!sale) {
         return <div className="checkout-container"><h2>Ingen varer i kurven</h2></div>;
@@ -20,8 +35,7 @@ function Checkout({ sale, setCart, setProducts }: Props) {
     async function confirmPayment() {
         setCart({ cartProducts: [] as CartType['cartProducts'], totalPrice: 0 });
         if (sale) {
-            await AddSale(sale);
-            await UpdateProductStock(sale, setProducts);
+            await AddSale(sale, setProducts);
         }
     }
 
