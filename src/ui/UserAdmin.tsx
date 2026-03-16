@@ -89,9 +89,9 @@ export function UserAdmin(): JSX.Element {
                             </tr>
 
                             {/* Existing Users List */}
-                            {users.map(user => (
+                            {users.map((user, index) => (
                                 <tr key={user.id}>
-                                    <th>{user.id}</th>
+                                    <th>{index+1}</th>
                                     <td>{user.username}</td>
                                     <td>{user.password}</td>
                                     <td className="delete-user">
