@@ -69,27 +69,6 @@ CREATE TABLE IF NOT EXISTS expenses (
     FOREIGN KEY (lan_date_id) REFERENCES lan_dates(id)
 );
 
+INSERT INTO users (username, password) VALUES ('test', 'test');
+
 -- If more tables are added go to the src/electron/database.ts to add it to the tableRequirements list
-
---INSERT INTO products (barcode, brand, name, price, bought_price, stock, happy_hour_price, image) VALUES
---('123456789012', 'BrandA', 'ProductA', 9.99, 7.99, 100, 7.99, 'path/to/imageA.jpg'),
---('234567890123', 'BrandB', 'ProductB', 19.99, 17.99, 50, 14.99, 'path/to/imageB.jpg'),
---('345678901234', 'BrandC', 'ProductC', 29.99, 20.99, 75, 24.99, 'path/to/imageC.jpg'),
---('456789012345', 'BrandD', 'ProductD', 7.14, 5.00, 1, 7.1423, 'path/to/imageD.jpg');
-
--- Regular sale
---INSERT INTO sales (transaction_id, product_id, quantity, price_per_unit, total_price, is_prize, is_happy_hour_purchase, loss) VALUES (1001, 1, 2, 15.00, 30.00, 0, 0, 0);
-
--- Happy hour purchase
---INSERT INTO sales (transaction_id, product_id, quantity, price_per_unit, total_price, is_prize, is_happy_hour_purchase, loss) VALUES (1002, 2, 1, 10.00, 10.00, 0, 1, 0);
-
--- Prize giveaway (no payment)
---INSERT INTO sales (transaction_id, product_id, quantity, price_per_unit, total_price, is_prize, is_happy_hour_purchase, loss) VALUES (1003, 3, 1, 0.00, 0.00, 1, 0, 0);
-
--- Loss due to expiration
---INSERT INTO sales (transaction_id, product_id, quantity, price_per_unit, total_price, is_prize, is_happy_hour_purchase, loss) VALUES (1004, 4, 5, 12.00, 60.00, 0, 0, 1);
-
--- Happy hour + prize combo
---INSERT INTO sales (transaction_id, product_id, quantity, price_per_unit, total_price, is_prize, is_happy_hour_purchase, loss) VALUES (1005, 5, 1, 0.00, 0.00, 1, 1, 0);
-
---INSERT INTO users (username, password) VALUES ('test', 'test');

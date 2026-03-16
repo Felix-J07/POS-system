@@ -65,6 +65,7 @@ export function ImportDatabase() {
     window.electron.import_database();
 }
 
+// Fetching LAN dates from the database and adding them to the LAN dates state
 export function GetLanDates(setLanDates: React.Dispatch<React.SetStateAction<LanDatesType[]>>) {
     window.electron.get_lan_dates().then((lanDates: LanDatesType[]) => {
         if (lanDates === undefined) {
@@ -76,10 +77,12 @@ export function GetLanDates(setLanDates: React.Dispatch<React.SetStateAction<Lan
     })
 }
 
+// Adding new and/or updating existing LAN dates to the database and refreshing the LAN dates state
 export function UpdateLanDates(lanDates: LanDatesType[], setLanDates: React.Dispatch<React.SetStateAction<LanDatesType[]>>) {
     window.electron.update_lan_dates(lanDates).then(() => GetLanDates(setLanDates));
 }
 
+// Fetching expenses from the database and adding them to the expenses list state
 export function GetExpenses(setExpenses: React.Dispatch<React.SetStateAction<Expenses[]>>) {
     window.electron.get_expenses().then((expenses: Expenses[]) => {
         if (expenses === undefined) {
@@ -91,10 +94,12 @@ export function GetExpenses(setExpenses: React.Dispatch<React.SetStateAction<Exp
     })
 }
 
+// Adding a new expense to the database and refreshing the expenses list state
 export function AddExpense(expense: Expenses, setExpenses: React.Dispatch<React.SetStateAction<Expenses[]>>) {
     window.electron.add_expense(expense).then(() => GetExpenses(setExpenses));
 }
 
+// Deleting an expense from the database and refreshing the expenses list state
 export function DeleteExpense(id: number | undefined, setExpenses: React.Dispatch<React.SetStateAction<Expenses[]>>) {
     if (!id) {
         console.log("Internal error (no expense id given)");
@@ -103,18 +108,23 @@ export function DeleteExpense(id: number | undefined, setExpenses: React.Dispatc
     window.electron.delete_expense(id).then(() => GetExpenses(setExpenses));
 }
 
+// Fetching users from the database and adding them to the users list state
 export function GetUsers(setUsers: React.Dispatch<React.SetStateAction<User[]>>) {
     window.electron.get_users().then(users => setUsers(users));
 }
 
+// Adding a new user to the database and refreshing the users list state
 export function AddUser(user: User, setUsers: React.Dispatch<React.SetStateAction<User[]>>) {
     window.electron.add_user(user).then(() => GetUsers(setUsers));
 }
 
+// Deleting a user from the database and refreshing the users list state
 export function DeleteUser(id: number, setUsers: React.Dispatch<React.SetStateAction<User[]>>) {
     window.electron.delete_user(id).then(() => GetUsers(setUsers));
 }
 
+// Checking if the given login credentials are correct by querying the database
+// Returns true if the credentials are correct, false otherwise
 export async function CheckLoginCredentials(username: string, password: string): Promise<boolean> {
     const res = await window.electron.login(username, password);
     if (res) {

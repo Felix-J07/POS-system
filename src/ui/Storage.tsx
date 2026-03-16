@@ -13,10 +13,7 @@ type StorageProps = {
     setProducts: React.Dispatch<React.SetStateAction<Product[]>>
 }
 
-// Show and manage product storage
-// Add, edit, delete products
-// Update product list from database
-// Future: Add functionality to import/export product list as CSV. Add functionality to add lost products (products that are wasn't sold but were thrown away or given to LAN members)
+// Main component for the storage page where you can see all products, add new products, edit existing products and remove unsellable products
 function Storage({ products, setProducts }: StorageProps) {
     // Changes the main-container minWidth based on the page
     useEffect(() => {
@@ -32,13 +29,15 @@ function Storage({ products, setProducts }: StorageProps) {
         };
     }, []);
 
+    // State for controlling the visibility of the modals and the selected product for editing 
     const [modalVisible, setModalVisible] = useState<boolean>(false);
     const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
 
+    // State for controlling the visibility of the loss modal
     const [lossModalVisible, setLossModalVisible] = useState<boolean>(false);
 
+    // An empty product object used for the "Add Product" modal
     const emptyProduct = {id: -1, barcode: "", brand: "", name: "", price: 0, bought_price: 0, stock: 0, happy_hour_price: 0, happy_hour_timestamps: []};
-
 
     return (
         <>
@@ -73,9 +72,12 @@ function Storage({ products, setProducts }: StorageProps) {
     );
 }
 
+// Component for the loss modal where you can select how many of each product you want to remove from the stock due to loss (e.g. broken, expired, etc.)
 function ProductLossDivs({ products, setProducts, setLossModalVisible }: { products: Product[], setProducts: React.Dispatch<React.SetStateAction<Product[]>>, setLossModalVisible: React.Dispatch<React.SetStateAction<boolean>> }) {
+    // State for keeping track of the amounts of each product to be removed
     const [amounts, setAmounts] = useState<number[]>(Array(products.length).fill(0));
 
+    // Function for increasing the amount of a product to be removed, with a check to not exceed the current stock
     function IncreaseAmount(index: number) {
         if (amounts[index] >= products[index].stock) {
             setAmounts(amounts.map((amt, i) => i === index ? products[index].stock : amt));
@@ -85,6 +87,7 @@ function ProductLossDivs({ products, setProducts, setLossModalVisible }: { produ
         return;
     }
 
+    // Function for decreasing the amount of a product to be removed, with a check to not go below 0
     function ReduceAmount(index: number) {
         if (amounts[index] <= 0) {
             setAmounts(amounts.map((amt, i) => i === index ? 0 : amt));
@@ -94,6 +97,7 @@ function ProductLossDivs({ products, setProducts, setLossModalVisible }: { produ
         return;
     }
 
+    // Function for confirming the loss of products, which creates a sale with the lost products and adds it to the database, then closes the modal
     function ConfirmLoss() {
         setLossModalVisible(false);
         let sale: Sale = { soldProducts: [], total_sale_price: 0, datetime: new Date().toISOString() };

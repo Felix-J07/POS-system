@@ -6,7 +6,6 @@ yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
-tree.txt
 
 node_modules
 dist
@@ -14,6 +13,9 @@ dist-react
 dist-electron
 *.local
 *.db
+
+# Do NOT ignore the empty database file
+!database.db
 
 # Editor directories and files
 .vscode/*

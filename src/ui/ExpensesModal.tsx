@@ -7,6 +7,7 @@ import "./static/ExpensesModal.css"
 export function ExpensesModal({ lanDates }: {lanDates: LanDatesType[]}): JSX.Element {
     const [expenses, setExpenses] = useState<Expenses[]>([]);
     
+    // Get all expenses from the database on component load
     useEffect(() => {
         GetExpenses(setExpenses);
     }, []);

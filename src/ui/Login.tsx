@@ -29,7 +29,7 @@ function Login({setLogged_in}: LoginProps): React.JSX.Element {
                 if (res) {
                     setLogged_in(true);
                 } else {
-                    alert('Invalid username or password');
+                    alert('Ugyldigt brugernavn og/eller adgangskode');
                 }
             });
         }

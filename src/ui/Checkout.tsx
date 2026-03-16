@@ -42,6 +42,7 @@ function Checkout({ sale, setCart, setProducts }: Props) {
     // Render the checkout component
     // Display sale items and total price, with a button to confirm payment
     // The confirm button runs confirmPayment function on click and navigates back to the main page
+    // The cancel button simply navigates back to the main page without confirming payment or resetting the order
     return (
         <div className="checkout-container">
             <h2>Betaling</h2>
@@ -58,6 +59,7 @@ function Checkout({ sale, setCart, setProducts }: Props) {
                 <span>{sale.total_sale_price.toFixed(2)} kr</span>
             </div>
             <Link to="/" style={{ color: 'white' }} onClick={confirmPayment}><button id="confirm-button">Bekræft betaling</button></Link>
+            <Link to="/" style={{ color: 'white' }}><button id="cancel-button">Gå tilbage</button></Link>
         </div>
     );
 }

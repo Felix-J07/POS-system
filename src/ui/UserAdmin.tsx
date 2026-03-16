@@ -3,9 +3,13 @@ import { ListPlus, Trash } from "lucide-react";
 import { AddUser, GetUsers, DeleteUser } from "./database";
 import "./static/UserAdmin.css";
 
+// The UserAdmin component provides an interface for managing users, allowing users to add new users and delete existing ones. 
+// It fetches the list of users from the database and displays them in a table format, with options to add or remove users as needed.
 export function UserAdmin(): JSX.Element {
+    // State to hold the list of users fetched from the database
     const [users, setUsers] = useState<User[]>([]);
 
+    // Fetch the list of users from the database when the component mounts
     useEffect(() => GetUsers(setUsers), []);
 
     // Handle form submission when user saves the new user
@@ -16,14 +20,20 @@ export function UserAdmin(): JSX.Element {
         // Saves the submitted form as a FormData object
         const form = new FormData(event.target as HTMLFormElement);
 
+        // Extracts the username and password values from the FormData object, trimming any leading or trailing whitespace
+        // Used to add a new user to the database, and ensuring that the username and password are not just whitespace
         const username = (form.get("username") as string).trimStart().trimEnd();
         const password = (form.get("password") as string).trimStart().trimEnd();
 
+        // Validates that both username and password are provided and not just whitespace
+        // If either the username or password is missing or consists solely of whitespace, an alert is shown to the user, and the function returns early without attempting to add the user to the database.
         if (!username || !password) {
             alert("Write username or/and password not only as whitespace.");
             return;
         }
 
+        // Attempts to add the new user to the database using the AddUser function. 
+        // If an error occurs during this process, an alert is shown to the user indicating that there was an error in the new user form, and the function returns early.
         try {
             AddUser({
                 username: username,

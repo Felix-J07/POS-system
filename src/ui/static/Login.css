@@ -4,7 +4,7 @@
     align-items: center;      /* Center horizontally */
     justify-content: center;  /* Center vertically */
     height: 90%;
-    width: 100vw;             /* Ensure full width for centering */
+    width: 100%;             /* Ensure full width for centering */
     margin-right: 90px;
 }
 

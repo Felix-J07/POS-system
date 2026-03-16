@@ -1,4 +1,4 @@
-import { ExportDatabase, ImportDatabase } from './database.ts';
+//import { ExportDatabase, ImportDatabase } from './database.ts';
 import { Modal } from './modal.tsx';
 import { useEffect, useState, type JSX } from 'react';
 import { LanDatesModal } from './lan_dates_modal.tsx';
@@ -11,12 +11,11 @@ type SettingsProps = {
     setLanDates: React.Dispatch<React.SetStateAction<LanDatesType[]>>;
 };
 
-// TODO: expenses
 
-// Settings component NOT DONE
-// Exporting database as a .db file to a user-specified location
-// Importing database from the .exe's directory (Overwrites current database) NOT DONE
-// Future settings: Change login credentials, add users, add LAN dates, anything else?
+// The Settings component which allows the user to access different settings modals such as LAN dates, expenses and user administration
+// The settings page is used to change settings or other configurations for the POS system
+// Previously, the database was saved in AppData folder, and therefore the settings page also had options to export and import the database
+// but this has been removed since the database is now saved in the same folder as the application, which makes it easier to access and manage for the user
 function Settings({lanDates, setLanDates}: SettingsProps) {
     // Changes the main-container minWidth based on the page
     useEffect(() => {
@@ -32,9 +31,11 @@ function Settings({lanDates, setLanDates}: SettingsProps) {
         };
     }, []);
     
+    // State for controlling the visibility and content of the modal
     const [modalVisible, setModalVisible] = useState(false);
     const [modalContent, setModalContent] = useState<JSX.Element | false>(false);
 
+    // Function to handle restricted access for certain settings, such as user administration, which requires the user to log in again to access
     function handleRestrictedAccess(modal_content: JSX.Element) {
         setModalVisible(true);
         setModalContent(
@@ -50,12 +51,14 @@ function Settings({lanDates, setLanDates}: SettingsProps) {
 
     return (
         <>
-            <div>
-                <button onClick={ExportDatabase}>Eksporter Database</button>
-            </div>
-            <div>
-                <button onClick={ImportDatabase}>Importer Database</button>
-            </div>
+            {/*
+                <div>
+                    <button onClick={ExportDatabase}>Eksporter Database</button>
+                </div>
+                <div>
+                    <button onClick={ImportDatabase}>Importer Database</button>
+                </div>
+            */}
             <div>
                 <button onClick={() => {setModalVisible(true); setModalContent(<LanDatesModal lanDates={lanDates} setLanDates={setLanDates} setModalVisible={setModalVisible} />);}}>LAN datoer</button>
             </div>

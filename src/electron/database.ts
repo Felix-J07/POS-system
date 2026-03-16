@@ -11,11 +11,17 @@ import fs from 'fs';
 //Object.assign(console, log.functions);
 
 // Defines the path to the mutable database file (in userData folder for production, in public folder for development)
-const dbPath = isDev() ? path.join(app.getAppPath(), ".", "public", "database.db") : path.join(app.getPath("userData"), "database.db");
+//const dbPath = isDev() ? path.join(app.getAppPath(), ".", "public", "database.db") : path.join(app.getPath("userData"), "database.db");
+let dbPath = isDev() ? path.join(app.getAppPath(), ".", "public", "database.db") : path.join(process.env.PORTABLE_EXECUTABLE_DIR || app.getPath("userData"), "database.db");
 
 // Copy the initial database from resources to userData if it doesn't exist yet (for production)
 if (!fs.existsSync(dbPath)) {
-  fs.copyFileSync(path.join(process.resourcesPath, "public", "database.db"), dbPath);
+  try {
+    fs.copyFileSync(path.join(process.resourcesPath, "public", "database.db"), dbPath);
+  } catch {
+    dbPath = isDev() ? path.join(app.getAppPath(), ".", "public", "database.db") : path.join(app.getPath("userData"), "database.db");
+    fs.copyFileSync(path.join(process.resourcesPath, "public", "database.db"), dbPath);
+  }
 }
 
 // Initialize the database connection

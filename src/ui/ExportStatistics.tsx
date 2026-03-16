@@ -4,6 +4,8 @@ import { BoolToNumber, formatDate, PrintDate } from "./helpers";
 import { GetExpenses } from "./database";
 import printCss from "./static/ExportStatisticsPDF.css?raw";
 
+// Types to make sure the data is structured correctly and to make it easier to work with on the table rendering part
+// These types are only used within this file, so they are not exported
 type TableItem = {
     barcode: string,
     name: string,
@@ -16,15 +18,13 @@ type TableItem = {
     totalRevenue: number,
     totalProfit: number,
     profitAvgPerItem: number
-}
-
+};
 type OverviewTableInfoType = {
     table: TableItem[], 
     revenue: number, 
     expenses: number, 
     profit: number
-}
-
+};
 type LanSpecificType = {
     salesTable: TableItem[], 
     expensesTable: Expenses[], 
@@ -33,19 +33,23 @@ type LanSpecificType = {
     profit: number,
     lanDate: LanDatesType
 };
-
 type ExportProps = {
     products: Product[], 
     lanDates: LanDatesType[], 
     saleStatistics: SaleStatistics[]
-}
+};
 
 export function ExportStatistics({products, lanDates, saleStatistics}: ExportProps): JSX.Element {
+    // State for the date interval chosen by the user for the export PDF
     const [exportInterval, setExportInterval] = useState<{startDate: Date, endDate: Date}>({startDate: new Date(), endDate: new Date()});
+    // State for the LANs that are within the chosen date interval, which is used to render the LAN specific tables in the PDF
     const [intervalLanDates, setIntervalLanDates] = useState<Array<LanDatesType>>([]);
+    // State for the information that is to be rendered in the tables in the PDF
     const [tableInfo, setTableInfo] = useState<{overview: OverviewTableInfoType, lanSpecific: LanSpecificType[]}>({overview: {table: [], revenue: 0, expenses: 0, profit: 0}, lanSpecific: []});
+    // State for the expenses data fetched from the database
     const [expenses, setExpenses] = useState<Expenses[]>([]);
 
+    // Ref and function for printing the PDF, which is done by rendering the PDF in an iframe and then calling the print function on the iframe's content window
     const iframeRef = useRef<HTMLIFrameElement | null>(null);
     const handlePrint = () => {
         const iframe = iframeRef.current;
@@ -54,17 +58,31 @@ export function ExportStatistics({products, lanDates, saleStatistics}: ExportPro
         iframe.contentWindow.print();
     };
 
+    // When the component renders, fetch the expenses data from the database and store it in the state
     useEffect(() => {
         GetExpenses(setExpenses);
     }, []);
 
+    // Whenever the user changes the date interval for the export data, update the intervalLanDates state to only include the LANs that are within the chosen date interval
     useEffect(() => {
-        setIntervalLanDates(lanDates.filter(
-            (lanDate) =>
-                lanDate.startDate.getTime() > exportInterval.startDate.getTime() &&
-                lanDate.startDate.getTime() < exportInterval.endDate.getTime()
-        ));
+        // Sets the start date to the beginning of the day and the end date to the end of the day to make sure that all data from each day is included in the export, even if the user only changes the date and not the time
+        exportInterval.startDate.setHours(0,0,0,0);
+        exportInterval.endDate.setHours(23,59,59,999);
 
+        // Filter the LANs to only include the ones that are within the chosen date interval, which is used to render the LAN specific tables in the PDF
+        const filteredLanDates = lanDates.filter((lan) => {
+            return (
+                lan.startDate >= exportInterval.startDate && 
+                lan.endDate <= exportInterval.endDate
+            );
+        });
+
+        setIntervalLanDates(filteredLanDates);
+    }, [exportInterval]);
+
+    // Whenever the intervalLanDates or expenses state changes, update the tableInfo state with the new information to be rendered in the PDF tables
+    useEffect(() => {
+        // This function takes a list of sales and populates a list of TableItem objects, which is used to render the tables in the PDF. It calculates the total revenue, total sold, total profit, and other relevant information for each product based on the sales data.
         function PopulateTableItemList(filteredFunctionSalesList: SaleStatistics[]) {
             let temporaryTable: TableItem[] = [];
 
@@ -93,16 +111,26 @@ export function ExportStatistics({products, lanDates, saleStatistics}: ExportPro
             return temporaryTable;
         }
 
+        // Filter the sales data to only include the sales that are within the chosen date interval, which is used to render the tables in the PDF
         const filteredSalesList: SaleStatistics[] = saleStatistics.filter((sale) => (sale.datetime < exportInterval.endDate && sale.datetime > exportInterval.startDate));
+        // Populate the overview table with the filtered sales data, by using the PopulateTableItemList function, which is used to render the overview table data in the PDF in a structured way
         const overviewTableItems: TableItem[] = PopulateTableItemList(filteredSalesList);
+        // Create a set of the LAN IDs that are within the chosen date interval, which is used to filter the expenses data to only include the expenses that are related to the LANs that are within the chosen date interval, 
+        // so that the expenses data is only included in the PDF if it is relevant to the LANs that are being exported
+        // A set is used here because it allows for efficient lookups when filtering the expenses data. By creating a set of the LAN IDs that are within the chosen date interval
+        // we can quickly check if an expense's LAN ID is in the set without having to iterate through a list of LAN IDs each time, which improves performance especially if there are many expenses and LANs.
         const allowedLanIds = new Set(intervalLanDates.map(lanDate => lanDate.id));
+        // Filter the expenses data to only include the expenses that are related to the LANs that are within the chosen date interval
         const filteredExpenses: Expenses[] = expenses.filter(expense => allowedLanIds.has(expense.lanDateId));
+        // Calculate the total revenue, total expenses, and total profit for the lan interval by summing up the relevant values from the overview table items and the filtered expenses
         const revenueNumber = overviewTableItems.reduce((sum, item) => sum + item.totalRevenue, 0);
         const expensesNumber = filteredExpenses.reduce((sum, expense) => sum + expense.amount, 0);
         const profitNumber = overviewTableItems.reduce((sum, item) => sum + item.totalProfit, 0);
+        // Create the overview table info object, which is used to render the overview table data in the PDF in a structured way
         const overviewTableInfo: OverviewTableInfoType = {table: overviewTableItems, revenue: revenueNumber, expenses: expensesNumber, profit: profitNumber};
+        
+        // For each LAN that is within the chosen date interval, calculate the relevant data for the LAN specific tables in the PDF, and populate a list of LanSpecificType objects
         let lanSpecificTableItems: LanSpecificType[] = [];
-
         intervalLanDates.forEach((lanDate) => {
             const sales = PopulateTableItemList(filteredSalesList.filter((sale) => (sale.datetime < lanDate.endDate && sale.datetime > lanDate.startDate)));
             const filteredLanExpenses = expenses.filter((expense) => expense.lanDateId === lanDate.id);
@@ -112,8 +140,9 @@ export function ExportStatistics({products, lanDates, saleStatistics}: ExportPro
             lanSpecificTableItems.push({salesTable: sales, expensesTable: filteredLanExpenses, revenue: revenueNumber, expenses: expensesNumber, profit: profitNumber, lanDate: lanDate});
         });
 
+        // Set the table info state with the new overview and LAN specific table data, which is used to render the tables in the PDF in a structured way
         setTableInfo({overview: overviewTableInfo, lanSpecific: lanSpecificTableItems});
-    }, [exportInterval, expenses]);
+    }, [intervalLanDates, expenses]);
     
     return (
         <div id="ExportStatisticsModal">
@@ -188,8 +217,10 @@ export function ExportStatistics({products, lanDates, saleStatistics}: ExportPro
                         <table className="summary-table">
                             <tbody>
                                 <tr>
-                                    <th>Total omsætning</th>
+                                    <th>Total omsætning<br/>(Profit efter varekøb)</th>
                                     <td className="numeric">{tableInfo.overview.revenue}</td>
+                                    <br/>
+                                    <td className="numeric">{tableInfo.overview.profit}</td>
                                 </tr>
                                 <tr>
                                     <th>Total udgifter</th>
@@ -197,7 +228,7 @@ export function ExportStatistics({products, lanDates, saleStatistics}: ExportPro
                                 </tr>
                                 <tr>
                                     <th>Total profit</th>
-                                    <td className={`numeric ${tableInfo.overview.profit < 0 ? "negative-profit" : "positive-profit"}`}>{tableInfo.overview.revenue-tableInfo.overview.expenses}</td>
+                                    <td className={`numeric ${tableInfo.overview.profit-tableInfo.overview.expenses < 0 ? "negative-profit" : "positive-profit"}`}>{tableInfo.overview.revenue-tableInfo.overview.expenses}</td>
                                 </tr>
                             </tbody>
                         </table>
@@ -273,8 +304,10 @@ export function ExportStatistics({products, lanDates, saleStatistics}: ExportPro
                                         <table className="summary-table">
                                             <tbody>
                                                 <tr>
-                                                    <th>Total omsætning</th>
+                                                    <th>Total omsætning<br/>(Profit efter varekøb)</th>
                                                     <td className="numeric">{info.revenue}</td>
+                                                    <br/>
+                                                    <td className="numeric">{info.profit}</td>
                                                 </tr>
                                                 <tr>
                                                     <th>Total udgifter</th>
@@ -282,7 +315,7 @@ export function ExportStatistics({products, lanDates, saleStatistics}: ExportPro
                                                 </tr>
                                                 <tr>
                                                     <th>Total profit</th>
-                                                    <td className={`numeric ${info.profit < 0 ? "negative-profit" : "positive-profit"}`}>{info.profit}</td>
+                                                    <td className={`numeric ${info.profit-info.expenses < 0 ? "negative-profit" : "positive-profit"}`}>{info.profit-info.expenses}</td>
                                                 </tr>
                                             </tbody>
                                         </table>
@@ -292,7 +325,7 @@ export function ExportStatistics({products, lanDates, saleStatistics}: ExportPro
                         }
                     </div>
                 )
-            } width="100%" height="380vh"></iframe>
+            } width="100%" height="100%"></iframe>
         </div>
     );
 }

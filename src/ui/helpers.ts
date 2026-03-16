@@ -13,6 +13,7 @@ export function GetPriceAndHappyHour(product: Product): [number, boolean] {
     return [product.price, is_happy_hour];
 }
 
+// Function to format a date into a string in the format "YYYY-MM-DD" for date format or "YYYY-MM-DDTHH:mm" for datetime format, which is used for input fields of type date and datetime-local
 export function formatDate(date: string | number | Date, format: "datetime" | "date") {
     const d = new Date(date);
     const pad = (n: number) => n.toString().padStart(2, "0");
@@ -30,6 +31,7 @@ export function BoolToNumber(value: boolean): number {
     else { return 0; }
 }
 
+// Function to print a date in the format "DD.MM.YYYY", which is used for displaying dates in the UI
 export function PrintDate(date: Date | undefined): string {
     if (!date) {
         return "N/A";

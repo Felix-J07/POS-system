@@ -113,6 +113,12 @@ export function ProductModal({ selectedProduct, setModalVisible, setProducts }: 
         DeleteProduct(productId, setProducts);
         setModalVisible(false);
     }
+
+    // Prevent the number input fields from changing value when scrolling the mouse wheel over them
+    // This is to fix an issue experienced at one of the LANs held in 2026
+    const preventScroll = (event: React.WheelEvent<HTMLInputElement>) => {
+        event.currentTarget.blur();
+    }
     
     // A form with input fields to add all the needed information about a product
     // Some of the input fields are "required" fields while others are not
@@ -133,15 +139,15 @@ export function ProductModal({ selectedProduct, setModalVisible, setProducts }: 
             </label>
             <label>
                 Pris:
-                <input type="number" min="0" step="0.01" defaultValue={selectedProduct.price} name="price" required />
+                <input type="number" min="0" step="0.01" defaultValue={selectedProduct.price} name="price" required onWheel={preventScroll} />
             </label>
             <label>
                 Pris for køb af vare:
-                <input type="number" min="0" step="0.01" defaultValue={selectedProduct.bought_price} name="bought_price" />
+                <input type="number" min="0" step="0.01" defaultValue={selectedProduct.bought_price} name="bought_price" onWheel={preventScroll} />
             </label>
             <label>
                 Lager:
-                <input type="number" min="0" step="1" defaultValue={selectedProduct.stock} name="stock" required />
+                <input type="number" min="0" step="1" defaultValue={selectedProduct.stock} name="stock" required onWheel={preventScroll} />
             </label>
             <label>
                 Billede URL:
@@ -151,7 +157,7 @@ export function ProductModal({ selectedProduct, setModalVisible, setProducts }: 
             <div className="happy-hour-section">
                 <label>
                     Happy hour pris:
-                    <input type="number" min="0" step="0.01" defaultValue={selectedProduct.happy_hour_price} name="happy_hour_price" />
+                    <input type="number" min="0" step="0.01" defaultValue={selectedProduct.happy_hour_price} name="happy_hour_price" onWheel={preventScroll} />
                 </label>
                 <h4>Happy Hour Tidsstempler</h4>
                 {tempHappyHourTimestamps.map((ts, index) => (

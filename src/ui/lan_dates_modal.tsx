@@ -11,6 +11,7 @@ type LanDatesModalProps = {
 };
 
 export function LanDatesModal({lanDates, setLanDates, setModalVisible}: LanDatesModalProps) {
+    // State for the temporary LAN dates list, which is used to store the changes made by the user before they are submitted and saved to the database. It is initialized with the current LAN dates from the props.
     const [tempLanDates, setTempLanDates] = useState<LanDatesType[]>(lanDates)
 
     // Update the date list when user changes a date

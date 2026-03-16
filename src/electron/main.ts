@@ -35,7 +35,6 @@ app.on('ready', () => {
         mainWindow.setMenuBarVisibility(false);
         mainWindow.setTitle("POS System");
         mainWindow.maximize();
-        mainWindow.webContents.openDevTools();
     }
 
     // IPC handlers for communication between the main and renderer processes

@@ -37,12 +37,10 @@ type StatisticsProps = {
     lanDates: LanDatesType[]
 }
 
-// Show sales statistics NOT DONE
-// Show total sales, profit, stock value NOT DONE
-// Show graphs for sales over time, profit over time, stock value over time NOT DONE
-// Filter by date range NOT DONE
-// Filter by product category NOT DONE
-// Future: Export statistics as CSV or PDF NOT DONE
+// The Statistics component is responsible for displaying various statistics about sales, revenue, profit etc.
+// It also allows the user to export the data and view details of specific sales. The component uses ChartJS to display graphs based on the sales data.
+// The component has two main sections: the left column which contains the graph and options for selecting the graph type and time range, and the right column which contains key figures and a list of recent sales
+// When a sale in the recent sales list is clicked, a modal opens showing details about that sale
 function Statistics({products, lanDates}: StatisticsProps) {
     // Changes the main-container minWidth based on the page
     useEffect(() => {
