@@ -126,7 +126,7 @@ Access the settings menu to:
 -   [Electron](https://www.electronjs.org/)
 -   [React](https://reactjs.org/)
 -   [TypeScript](https://www.typescriptlang.org/)
--   [SQLite3](https://github.com/mapbox/node-sqlite3)
+-   [SQLite3](https://sqlite.org/)
 -   [Vite](https://vitejs.dev/)
 -   And more
 
@@ -134,7 +134,7 @@ See all npm packages under `package.json` then `dependencies` and `devDependenci
 
 ## Security
 
-- The app uses a Content Security Policy (CSP) that allows images from any URL on the web for product images.
+- The app uses a Content Security Policy (CSP) but still allows images from any URL on the web for product images.
 
 ## Be aware
 
